@@ -31,64 +31,43 @@ export function StickyFooter() {
   return (
     <AnimatePresence>
       {isAtBottom && (
-        <motion.div
-          className="fixed z-50 bottom-0 left-0 w-full h-80 flex justify-center items-center"
-          style={{ backgroundColor: "#e78a53" }}
+        <motion.footer
+          className="fixed z-50 bottom-0 left-0 w-full"
           initial={{ y: "100%" }}
           animate={{ y: 0 }}
           exit={{ y: "100%" }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         >
-          <div
-            className="relative overflow-hidden w-full h-full flex justify-end px-12 text-right items-start py-12"
-            style={{ color: "#121113" }}
-          >
-            <motion.div
-              className="flex flex-row space-x-12 sm:space-x-16 md:space-x-24 text-sm sm:text-lg md:text-xl"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-            >
-              <ul className="space-y-2">
-                <li
-                  className="hover:underline cursor-pointer transition-colors"
-                  style={{ color: "#121113" }}
-                  onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "rgba(18, 17, 19, 0.8)")}
-                  onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "#121113")}
-                >
-                  Home
-                </li>
-                <li
-                  className="hover:underline cursor-pointer transition-colors"
-                  style={{ color: "#121113" }}
-                  onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "rgba(18, 17, 19, 0.8)")}
-                  onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "#121113")}
-                >
-                  Docs
-                </li>
-                <li
-                  className="hover:underline cursor-pointer transition-colors"
-                  style={{ color: "#121113" }}
-                  onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "rgba(18, 17, 19, 0.8)")}
-                  onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "#121113")}
-                >
-                  Components
-                </li>
-              </ul>
-              <ul className="space-y-2">
-              </ul>
-            </motion.div>
-            <motion.h2
-              className="absolute bottom-0 left-0 translate-y-1/3 sm:text-[192px] text-[80px] font-bold select-none"
-              style={{ color: "#121113" }}
-              initial={{ opacity: 0, x: -100 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-            >
-              Blockbayan
-            </motion.h2>
+          <div className="bg-[#e78a53]/80 backdrop-blur-sm text-[#121113] py-12 px-8">
+            <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+              <div className="col-span-1 md:col-span-2">
+                <h2 className="text-3xl font-bold mb-4">Blockbayan</h2>
+                <p className="text-black/80 max-w-md">
+                  Revolutionizing charitable giving through the power of blockchain. Transparent, secure, and global.
+                </p>
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg mb-4">Quick Links</h3>
+                <ul className="space-y-2">
+                  <li><a href="#features" className="hover:text-black/80 transition-colors">Features</a></li>
+                  <li><a href="#testimonials" className="hover:text-black/80 transition-colors">Testimonials</a></li>
+                  <li><a href="#faq" className="hover:text-black/80 transition-colors">FAQ</a></li>
+                </ul>
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg mb-4">Follow Us</h3>
+                <ul className="space-y-2">
+                  <li><a href="#" className="hover:text-black/80 transition-colors">Twitter</a></li>
+                  <li><a href="#" className="hover:text-black/80 transition-colors">LinkedIn</a></li>
+                  <li><a href="#" className="hover:text-black/80 transition-colors">Facebook</a></li>
+                </ul>
+              </div>
+            </div>
+            <div className="mt-8 border-t border-black/20 pt-6 text-center text-black/70">
+              <p>&copy; {new Date().getFullYear()} Blockbayan. All rights reserved.</p>
+            </div>
           </div>
-        </motion.div>
+        </motion.footer>
       )}
     </AnimatePresence>
   )
