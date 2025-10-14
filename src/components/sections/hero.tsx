@@ -5,6 +5,8 @@ import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Sparkles } from "lucide-react"
 import TextType from '../TextType';
+import { driver } from "driver.js";
+import "driver.js/dist/driver.css";
 
 export default function Hero() {
   const [mounted, setMounted] = useState(false)
@@ -12,6 +14,93 @@ export default function Hero() {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  const handleTour = () => {
+    const driverObj = driver({
+      showProgress: true,
+      animate: true,
+      steps: [
+        {
+          element: "#main-title",
+          popover: {
+            title: "Welcome to Blockbayan",
+            description: "Transparency meets Bayanihan. Our mission is to bring trust and collaboration to the forefront.",
+            onNextClick: () => {
+              const nextElement = document.querySelector("#features");
+              if (nextElement) {
+                const elementPosition = nextElement.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementPosition - 120; // Adjust for sticky header
+
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: "smooth",
+                });
+
+                setTimeout(() => {
+                  driverObj.moveNext();
+                }, 500); // Adjust timeout to match scroll duration
+              }
+            },
+          },
+        },
+        {
+          element: "#features",
+          popover: {
+            title: "Features",
+            description: "Discover the powerful features that make Blockbayan unique.",
+            onNextClick: () => {
+              const nextElement = document.querySelector("#testimonials");
+              if (nextElement) {
+                const elementPosition = nextElement.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementPosition - 120;
+
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: "smooth",
+                });
+
+                setTimeout(() => {
+                  driverObj.moveNext();
+                }, 500);
+              }
+            },
+          },
+        },
+        {
+          element: "#testimonials",
+          popover: {
+            title: "Testimonials",
+            description: "See what our users have to say about their experience.",
+            onNextClick: () => {
+              const nextElement = document.querySelector("#faq");
+              if (nextElement) {
+                const elementPosition = nextElement.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementPosition - 120;
+
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: "smooth",
+                });
+
+                setTimeout(() => {
+                  driverObj.moveNext();
+                }, 500);
+              }
+            },
+          },
+        },
+        {
+          element: "#faq",
+          popover: {
+            title: "FAQs",
+            description: "Have questions? We have the answers for you right here.",
+          },
+        },
+      ],
+    });
+
+    driverObj.drive();
+  };
 
   if (!mounted) {
     return null
@@ -44,6 +133,28 @@ export default function Hero() {
               </h1>
             </motion.div>
 
+              {/* Description */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mx-auto mb-12 max-w-2xl text-lg text-muted-foreground h-3" // Added h-20 for space
+            >
+              <TextType 
+                text={[
+                  "Transparent tools, built for collaboration and trust.",
+                  "Share, improve, and grow together through open innovation.",
+                  "Let’s build the future, side by side."
+                ]}
+                typingSpeed={75}
+                pauseDuration={1500}
+                showCursor={true}
+                cursorCharacter="|"
+                className="text-lg text-muted-foreground"
+              />
+            </motion.div>
+          </div>
+
             {/* Get started button and decorative elements */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -68,7 +179,7 @@ export default function Hero() {
               </svg>
 
               {/* Get started button */}
-              <div className="flex items-center justify-center">
+              <div className="flex items-center justify-center gap-4">
                 <a href="/docs/components/theme-toggle-animations">
                   <div className="group cursor-pointer border border-border bg-card gap-2 h-[60px] flex items-center p-[10px] rounded-full">
                     <div className="border border-border bg-primary h-[40px] rounded-full flex items-center justify-center text-primary-foreground">
@@ -111,32 +222,17 @@ export default function Hero() {
                     </div>
                   </div>
                 </a>
+                <button onClick={handleTour} className="group cursor-pointer border border-border bg-card gap-2 h-[60px] flex items-center p-[10px] rounded-full">
+                  <div className="h-[40px] rounded-full flex items-center justify-center text-foreground">
+                    <p className="font-medium tracking-tight mr-3 ml-3 flex items-center gap-2 justify-center text-base">
+                      Take a Tour
+                    </p>
+                  </div>
+                </button>
               </div>
             </motion.div>
 
             {/* Description */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="mx-auto mb-12 max-w-2xl text-lg text-muted-foreground h-20" // Added h-20 for space
-            >
-              <TextType 
-                text={[
-                  "Transparent tools, built for collaboration and trust.",
-                  "Share, improve, and grow together through open innovation.",
-                  "Let’s build the future, side by side."
-                ]}
-                typingSpeed={75}
-                pauseDuration={1500}
-                showCursor={true}
-                cursorCharacter="|"
-                className="text-lg text-muted-foreground"
-              />
-            </motion.div>
-          </div>
-
-          {/* Social Proof Section */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
