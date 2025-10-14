@@ -56,7 +56,7 @@ export default function Features() {
             geist.className,
           )}
         >
-          Features
+          Key Features
         </h2>
         <FollowerPointerCard
           title={
@@ -67,10 +67,10 @@ export default function Features() {
           }
         >
           <div className="cursor-none">
-            <div className="grid grid-cols-12 gap-4 justify-center">
-              {/* Cli */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 justify-center">
+              {/* Transparent Donations */}
               <motion.div
-                className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col overflow-hidden rounded-xl border-2 p-6 shadow-xl transition-all ease-in-out md:col-span-6 xl:col-span-6 xl:col-start-2"
+                className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col overflow-hidden rounded-xl border-2 p-6 shadow-xl transition-all ease-in-out md:col-span-6 xl:col-span-5"
                 onMouseEnter={() => setIsCliHovering(true)}
                 onMouseLeave={() => setIsCliHovering(false)}
                 ref={ref}
@@ -85,10 +85,10 @@ export default function Features() {
                 style={{ transition: "all 0s ease-in-out" }}
               >
                 <div className="flex flex-col gap-4">
-                  <h3 className="text-2xl leading-none font-semibold tracking-tight">CLI & Manual Support</h3>
+                  <h3 className="text-2xl leading-none font-semibold tracking-tight">Transparent & Secure Donations</h3>
                   <div className="text-md text-muted-foreground flex flex-col gap-2 text-sm">
                     <p className="max-w-[460px]">
-                      Integrate your landing page directly in the product while using your favorite tools.
+                      Every donation is recorded on the blockchain, providing unparalleled transparency and security. Track your contribution from your wallet to the cause.
                     </p>
                   </div>
                 </div>
@@ -100,8 +100,8 @@ export default function Features() {
                     {/* Background Image */}
                     <div className="absolute inset-0">
                       <img
-                        src="https://framerusercontent.com/images/UjqUIiBHmIcSH9vos9HlG2BF4bo.png"
-                        alt="Arrow-CoreExchange"
+                        src="/blockchain-network.png"
+                        alt="Blockchain Network"
                         className="w-full h-full object-cover rounded-xl"
                       />
                     </div>
@@ -162,7 +162,7 @@ export default function Features() {
                       <div className="flex items-center gap-8">
                         {/* Left Column */}
                         <div className="flex flex-col gap-3">
-                          {["Feature-1", "Feature-1", "Feature-1"].map((item, index) => (
+                          {["Donation", "Charity", "Impact"].map((item, index) => (
                             <motion.div
                               key={`left-${index}`}
                               className="bg-white rounded px-3 py-2 flex items-center gap-2 text-black text-sm font-medium shadow-sm"
@@ -176,8 +176,8 @@ export default function Features() {
                             >
                               <div className="w-4 h-4 flex items-center justify-center">
                                 {index === 0 && <span className="text-xs">📄</span>}
-                                {index === 1 && <span className="text-xs">💰</span>}
-                                {index === 2 && <span className="text-xs">🏢</span>}
+                                {index === 1 && <span className="text-xs">🏢</span>}
+                                {index === 2 && <span className="text-xs">💖</span>}
                               </div>
                               {item}
                             </motion.div>
@@ -193,15 +193,15 @@ export default function Features() {
                           whileHover={{ scale: 1.1, rotate: 5 }}
                         >
                           <img
-                            src="https://framerusercontent.com/images/q43ivjLz67lXhWf6TKfLIh0FY.png"
-                            alt="Logo"
+                            src="/logo.svg"
+                            alt="Blockbayan Logo"
                             className="w-full h-full object-cover"
                           />
                         </motion.div>
 
                         {/* Right Column */}
                         <div className="flex flex-col gap-3">
-                          {["Feature-1", "Feature-1", "Feature-1"].map((item, index) => (
+                          {["Donor", "Transaction", "Beneficiary"].map((item, index) => (
                             <motion.div
                               key={`right-${index}`}
                               className="bg-white rounded px-3 py-2 flex items-center gap-2 text-black text-sm font-medium shadow-sm"
@@ -256,9 +256,9 @@ export default function Features() {
                 </div>
               </motion.div>
 
-              {/* Global */}
+              {/* Global Reach */}
               <motion.div
-                className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col overflow-hidden rounded-xl border-2 p-6 shadow-xl transition-all ease-in-out md:col-span-6 xl:col-span-6 xl:col-start-8"
+                className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col overflow-hidden rounded-xl border-2 p-6 shadow-xl transition-all ease-in-out md:col-span-6 xl:col-span-7"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
                 ref={ref}
@@ -273,11 +273,10 @@ export default function Features() {
                 style={{ transition: "all 0s ease-in-out" }}
               >
                 <div className="flex flex-col gap-4">
-                  <h3 className="text-2xl leading-none font-semibold tracking-tight">Globally Usable</h3>
+                  <h3 className="text-2xl leading-none font-semibold tracking-tight">Global Reach, Local Impact</h3>
                   <div className="text-md text-muted-foreground flex flex-col gap-2 text-sm">
                     <p className="max-w-[460px]">
-                      Blocks are available everywhere but ours are the best. Use them in your favorite framework or even
-                      in plain HTML.
+                      Donate to causes from anywhere in the world. Our platform connects you with verified organizations, both local and international.
                     </p>
                   </div>
                 </div>
@@ -285,7 +284,7 @@ export default function Features() {
                   <h1 className="mt-8 text-center text-5xl leading-[100%] font-semibold sm:leading-normal lg:mt-12 lg:text-6xl">
                     <span className='bg-background relative mt-3 inline-block w-fit rounded-md border px-1.5 py-0.5 before:absolute before:top-0 before:left-0 before:z-10 before:h-full before:w-full before:bg-[url("/noise.gif")] before:opacity-[0.09] before:content-[""]'>
                       <ScrambleHover
-                        text="feature-2"
+                        text="Donate Globally"
                         scrambleSpeed={70}
                         maxIterations={20}
                         useOriginalCharsOnly={false}
@@ -314,9 +313,9 @@ export default function Features() {
                 </div>
               </motion.div>
 
-              {/* Smart Components */}
+              {/* Real-Time Tracking */}
               <motion.div
-                className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col overflow-hidden rounded-xl border-2 p-6 shadow-xl transition-all ease-in-out md:col-span-6 xl:col-span-6 xl:col-start-2"
+                className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col overflow-hidden rounded-xl border-2 p-6 shadow-xl transition-all ease-in-out md:col-span-6 xl:col-span-7"
                 onMouseEnter={() => setIsFeature3Hovering(true)}
                 onMouseLeave={() => setIsFeature3Hovering(false)}
                 initial={{ opacity: 0, y: 50 }}
@@ -330,10 +329,10 @@ export default function Features() {
                 style={{ transition: "all 0s ease-in-out" }}
               >
                 <div className="flex flex-col gap-4">
-                  <h3 className="text-2xl leading-none font-semibold tracking-tight">Smart Components</h3>
+                  <h3 className="text-2xl leading-none font-semibold tracking-tight">Real-Time Donation Tracking</h3>
                   <div className="text-md text-muted-foreground flex flex-col gap-2 text-sm">
                     <p className="max-w-[460px]">
-                      Intelligent components that adapt to your needs with built-in animations and interactions.
+                      Enter your transaction hash to see the status and journey of your donation on the blockchain in real-time.
                     </p>
                   </div>
                 </div>
@@ -343,7 +342,7 @@ export default function Features() {
                       <div className="p-4">
                         <textarea
                           className="w-full min-h-[100px] bg-transparent border-none text-white placeholder:text-white/50 resize-none focus:outline-none text-base leading-relaxed"
-                          placeholder="Search the web..."
+                          placeholder="Enter Transaction Hash..."
                           value={inputValue}
                           onChange={(e) => setInputValue(e.target.value)}
                           onKeyDown={handleKeyDown}
@@ -383,7 +382,7 @@ export default function Features() {
                               <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path>
                               <path d="M2 12h20"></path>
                             </svg>
-                            Search
+                            Track
                           </button>
                         </div>
                         <button className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors">
@@ -409,9 +408,9 @@ export default function Features() {
                 </div>
               </motion.div>
 
-              {/* Dynamic Layouts */}
+              {/* Verified Organizations */}
               <motion.div
-                className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col overflow-hidden rounded-xl border-2 p-6 shadow-xl transition-all ease-in-out md:col-span-6 xl:col-span-6 xl:col-start-8"
+                className="group border-secondary/40 text-card-foreground relative col-span-12 flex flex-col overflow-hidden rounded-xl border-2 p-6 shadow-xl transition-all ease-in-out md:col-span-6 xl:col-span-5"
                 onMouseEnter={() => setIsFeature4Hovering(true)}
                 onMouseLeave={() => setIsFeature4Hovering(false)}
                 initial={{ opacity: 0, y: 50 }}
@@ -426,18 +425,18 @@ export default function Features() {
                 style={{ transition: "all 0s ease-in-out" }}
               >
                 <div className="flex flex-col gap-4">
-                  <h3 className="text-2xl leading-none font-semibold tracking-tight">Dynamic Layouts</h3>
+                  <h3 className="text-2xl leading-none font-semibold tracking-tight">Verified Organizations</h3>
                   <div className="text-md text-muted-foreground flex flex-col gap-2 text-sm">
                     <p className="max-w-[460px]">
-                      Responsive layouts that transform and adapt seamlessly across all device sizes.
+                      We partner with trusted, verified non-profits and charities to ensure your donations make a real impact.
                     </p>
                   </div>
                 </div>
                 <div className="flex grow items-center justify-center select-none relative min-h-[300px] p-4">
                   <div className="relative w-full max-w-sm">
                     <img
-                      src="/modern-grid-layout.png"
-                      alt="Dynamic Layout Example"
+                      src="/verified-orgs.jpg"
+                      alt="Verified Organizations"
                       className="w-full h-auto rounded-lg shadow-lg"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg"></div>
