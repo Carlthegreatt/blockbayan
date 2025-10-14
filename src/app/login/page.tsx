@@ -2,13 +2,13 @@
 
 import type React from "react";
 
-import { useState } from "react"
-import { motion } from "framer-motion"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useState } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 // Dummy user data
 const DUMMY_USERS = [
@@ -16,55 +16,62 @@ const DUMMY_USERS = [
     email: "admin@blockbayan.com",
     password: "admin123",
     name: "Admin User",
-    type: "admin"
+    type: "admin",
   },
   {
     email: "user@blockbayan.com",
     password: "user123",
     name: "John Doe",
-    type: "personal"
+    type: "personal",
   },
   {
     email: "org@blockbayan.com",
     password: "org123",
     name: "ABC Organization",
-    type: "organization"
-  }
-]
+    type: "organization",
+  },
+];
 
 export default function LoginPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
     // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Check credentials against dummy data
     const user = DUMMY_USERS.find(
       (u) => u.email === email && u.password === password
-    )
+    );
 
     if (user) {
-      console.log("Login successful:", { email: user.email, name: user.name, type: user.type })
+      console.log("Login successful:", {
+        email: user.email,
+        name: user.name,
+        type: user.type,
+      });
       // Store user data in localStorage (in production, use proper session management)
-      localStorage.setItem("user", JSON.stringify({ email: user.email, name: user.name, type: user.type }))
-      // Redirect to home page
-      router.push("/")
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ email: user.email, name: user.name, type: user.type })
+      );
+      // Redirect to dashboard (main app)
+      router.push("/dashboard");
     } else {
-      setError("Invalid email or password")
-      console.log("Login failed:", { email, password })
+      setError("Invalid email or password");
+      console.log("Login failed:", { email, password });
     }
 
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
@@ -199,7 +206,9 @@ export default function LoginPage() {
 
           {/* Demo Credentials */}
           <div className="mt-6 bg-zinc-800/30 border border-zinc-700 rounded-lg p-4">
-            <p className="text-xs font-semibold text-zinc-300 mb-2">Demo Credentials:</p>
+            <p className="text-xs font-semibold text-zinc-300 mb-2">
+              Demo Credentials:
+            </p>
             <div className="space-y-1 text-xs text-zinc-400">
               <p>Admin: admin@blockbayan.com / admin123</p>
               <p>User: user@blockbayan.com / user123</p>
