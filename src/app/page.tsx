@@ -75,6 +75,13 @@ export default function Home() {
             alt="Logo"
             className="text-foreground rounded-full size-8 w-8"
           />
+          <span
+            className={`text-xl font-bold text-foreground transition-all duration-300 whitespace-nowrap ${
+              isScrolled ? "opacity-0 w-0 overflow-hidden" : "opacity-100"
+            }`}
+          >
+            BlockBayan
+          </span>
         </div>
 
         <div className="absolute inset-0 hidden flex-1 flex-row items-center justify-center space-x-2 text-sm font-medium text-muted-foreground transition duration-200 hover:text-foreground md:flex md:space-x-2">
@@ -170,6 +177,9 @@ export default function Home() {
             alt="Logo"
             className="text-foreground rounded-full size-7 w-7"
           />
+          <span className="text-lg font-bold text-foreground">
+            BlockBayan
+          </span>
         </div>
 
         <button
@@ -253,8 +263,6 @@ export default function Home() {
       <div id="testimonials">
         <TestimonialsSection />
       </div>
-
-      <NewReleasePromo />
 
       {/* FAQ Section */}
       <div id="faq">
