@@ -44,27 +44,7 @@ export default function Hero() {
               </h1>
             </motion.div>
 
-            {/* Description */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              className="mx-auto mb-12 max-w-2xl text-lg text-muted-foreground h-20" // Added h-20 for space
-            >
-              <TextType 
-                text={[
-                  "Transparent tools, built for collaboration and trust.",
-                  "Share, improve, and grow together through open innovation.",
-                  "Let’s build the future, side by side."
-                ]}
-                typingSpeed={75}
-                pauseDuration={1500}
-                showCursor={true}
-                cursorCharacter="|"
-                className="text-lg text-muted-foreground"
-              />
-            </motion.div>
-
+            {/* Get started button and decorative elements */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -132,6 +112,27 @@ export default function Hero() {
                   </div>
                 </a>
               </div>
+            </motion.div>
+
+            {/* Description */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="mx-auto mb-12 max-w-2xl text-lg text-muted-foreground h-20" // Added h-20 for space
+            >
+              <TextType 
+                text={[
+                  "Transparent tools, built for collaboration and trust.",
+                  "Share, improve, and grow together through open innovation.",
+                  "Let’s build the future, side by side."
+                ]}
+                typingSpeed={75}
+                pauseDuration={1500}
+                showCursor={true}
+                cursorCharacter="|"
+                className="text-lg text-muted-foreground"
+              />
             </motion.div>
           </div>
 
