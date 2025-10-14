@@ -37,7 +37,7 @@ const mockCampaigns = [
     deadline: "2025-11-30",
     chain: "Ethereum",
     location: "Mindanao, Philippines",
-    image: "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=800&q=80",
+    image: "https://mindanews.com/wp-content/uploads/2024/07/CLASSES-DAVAO-CITY-NHS.jpg",
   },
   {
     id: "2",
@@ -53,7 +53,7 @@ const mockCampaigns = [
     deadline: "2025-12-15",
     chain: "Polygon",
     location: "Visayas, Philippines",
-    image: "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&q=80",
+    image: "https://files01.pna.gov.ph/category-list/2022/09/28/dswd-relief-ops-in-jomalig-quezonpic-courtesy-of-dswd.jpg",
   },
   {
     id: "3",
@@ -69,7 +69,7 @@ const mockCampaigns = [
     deadline: "2025-12-30",
     chain: "Ethereum",
     location: "Luzon, Philippines",
-    image: "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&q=80",
+    image: "https://www.dai.com/uploads/LUCAB%20PWS%20(4).jpg",
   },
   {
     id: "4",
@@ -85,7 +85,7 @@ const mockCampaigns = [
     deadline: "2026-01-15",
     chain: "Base",
     location: "Cordillera, Philippines",
-    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
+    image: "https://mindanews.com/wp-content/uploads/2020/07/28haran11.jpg",
   },
 ]
 
