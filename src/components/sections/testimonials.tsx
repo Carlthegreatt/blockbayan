@@ -1,62 +1,71 @@
+import StarRating from "@/components/ui/star-rating"
 import { Marquee } from "@/components/marquee"
 
 const testimonials = [
   {
-    name: "Arjun Mehta",
-    username: "@arjdev",
-    body: "v0 has completely changed the way I build UIs. Generate, copy-paste, done. No more design stress.",
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+    name: "Jhered Republica",
+    username: "@red-sakai",
+    body: "Blockbayan has revolutionized how I support causes I care about. The transparency of blockchain donations is a game-changer. I can see exactly where my contributions go.",
+    img: "/red-sakai.jpg",
+    rating: 4.8,
   },
   {
-    name: "Sara Lin",
-    username: "@sara.codes",
-    body: "Honestly shocked at how smooth the v0 generated components are out of the box. Just works perfectly.",
-    img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop&crop=face",
+    name: "Carl Blancaflor",
+    username: "@carlthegreatt",
+    body: "I'm amazed by how easy and secure it is to donate with Blockbayan. Knowing my donations are tracked on the blockchain gives me complete peace of mind.",
+    img: "/carlthegreatt.jpg",
+    rating: 5,
   },
   {
-    name: "Devon Carter",
-    username: "@devninja",
-    body: "Our team launched a client site in 2 days using v0 components. Saved so much development time.",
-    img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+    name: "Carl Erosa",
+    username: "@CarlErosa",
+    body: "Our organization started using Blockbayan for fundraising, and the trust it builds with donors is incredible. A must-have for any non-profit.",
+    img: "/CarlErosa.jpg",
+    rating: 4.9,
   },
   {
-    name: "Priya Shah",
-    username: "@priyacodes",
-    body: "Generated a few components in v0 and everything blended perfectly with our codebase. Massive W.",
-    img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face",
+    name: "Ezekiel Bustamante",
+    username: "@defzeke",
+    body: "Blockbayan's platform is seamless. I donated to a local charity in seconds, and the low transaction fees mean more of my money goes to the cause.",
+    img: "/defzeke.jpg",
+    rating: 4.7,
   },
   {
-    name: "Leo Martin",
-    username: "@leobuilds",
-    body: "Found a beautiful hero section in v0, tweaked the prompt, and shipped in 15 minutes. Game changer.",
-    img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+    name: "Mary Relator",
+    username: "@MaryRuth17",
+    body: "I found a cause I'm passionate about on Blockbayan and donated instantly. The ability to track my donation's journey is something I've never seen before. Truly innovative.",
+    img: "/MaryRuth17.jpg",
+    rating: 4.5,
   },
   {
-    name: "Chloe Winters",
-    username: "@chloewinters",
-    body: "v0 helped us prototype multiple landing pages without writing CSS once. Pure magic.",
-    img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face",
+    name: "Marvin Erosa",
+    username: "@marvinjameserosa",
+    body: "Blockbayan is the future of charitable giving. It's transparent, efficient, and connects donors directly to the impact they're making.",
+    img: "/marvinjameserosa.jpg",
+    rating: 4.6,
   },
   {
-    name: "Ayaan Malik",
-    username: "@ayaan_dev",
-    body: "As a solo founder, v0 lets me move fast without sacrificing design quality. Essential tool.",
-    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+    name: "Tony Stark",
+    username: "@j4rv1555",
+    body: "As an academic, I appreciate the integrity Blockbayan brings to philanthropy. Blockchain technology ensures every donation is accounted for, fostering a new level of trust.",
+    img: "/j4rv1555.jpg",
+    rating: 4.2,
   },
   {
-    name: "Monica Reeves",
-    username: "@monicareeves",
-    body: "Can't believe how polished the v0 generated components look. Clients are impressed every time.",
-    img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
+    name: "James Doakes",
+    username: "@doakes",
+    body: "The engineering behind Blockbayan is impressive. It's a robust and secure platform that makes a real-world difference. Proud to be a user.",
+    img: "/doakes.png",
+    rating: 4.3,
   },
   {
-    name: "James Roy",
-    username: "@jamesrdev",
-    body: "v0 is a lifesaver when deadlines are tight. Generate a component, tweak, and deploy instantly.",
-    img: "https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=150&h=150&fit=crop&crop=face",
+    name: "Jackie Chan",
+    username: "@jackie_ch4n",
+    body: "Blockbayan makes it simple to support global and local initiatives. It's a powerful tool for anyone who wants to contribute to a better world with confidence.",
+    img: "/jackie_ch4n.jpg",
+    rating: 4.4,
   },
-]
-
+];
 const firstColumn = testimonials.slice(0, 3)
 const secondColumn = testimonials.slice(3, 6)
 const thirdColumn = testimonials.slice(6, 9)
@@ -66,17 +75,21 @@ const TestimonialCard = ({
   name,
   username,
   body,
+  rating,
 }: {
   img: string
   name: string
   username: string
   body: string
+  rating: number
 }) => {
   return (
     <div className="relative w-full max-w-xs overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-white/[0.02] p-10 shadow-[0px_2px_0px_0px_rgba(255,255,255,0.1)_inset]">
       <div className="absolute -top-5 -left-5 -z-10 h-40 w-40 rounded-full bg-gradient-to-b from-[#e78a53]/10 to-transparent blur-md"></div>
 
-      <div className="text-white/90 leading-relaxed">{body}</div>
+      <StarRating rating={rating} />
+
+      <div className="mt-4 text-white/90 leading-relaxed">{body}</div>
 
       <div className="mt-5 flex items-center gap-2">
         <img src={img || "/placeholder.svg"} alt={name} height="40" width="40" className="h-10 w-10 rounded-full" />
