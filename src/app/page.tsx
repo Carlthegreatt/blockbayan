@@ -1,10 +1,10 @@
 "use client"
 import { useState, useEffect } from "react"
-import Hero from "@/components/hero"
-import Features from "@/components/features"
-import { TestimonialsSection } from "@/components/testimonials"
-import { NewReleasePromo } from "@/components/new-release-promo"
-import { FAQSection } from "@/components/faq-section"
+import Hero from "@/components/sections/hero"
+import Features from "@/components/sections/features"
+import { TestimonialsSection } from "@/components/sections/testimonials"
+import { NewReleasePromo } from "@/components/sections/new-release-promo"
+import { FAQSection } from "@/components/sections/faq-section"
 import { StickyFooter } from "@/components/sticky-footer"
 
 export default function Home() {
