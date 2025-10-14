@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
 import { useState } from "react"
 import { motion } from "framer-motion"
@@ -72,8 +72,18 @@ export default function LoginPage() {
         href="/"
         className="absolute top-6 left-6 z-20 text-zinc-400 hover:text-[#e78a53] transition-colors duration-200 flex items-center space-x-2"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
         </svg>
         <span>Back to Home</span>
       </Link>
@@ -158,7 +168,10 @@ export default function LoginPage() {
                 />
                 <span className="text-zinc-300">Remember me</span>
               </label>
-              <Link href="#" className="text-sm text-[#e78a53] hover:text-[#e78a53]/80">
+              <Link
+                href="#"
+                className="text-sm text-[#e78a53] hover:text-[#e78a53]/80"
+              >
                 Forgot password?
               </Link>
             </div>
@@ -175,7 +188,10 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-zinc-400">
               Don't have an account?{" "}
-              <Link href="/signup" className="text-[#e78a53] hover:text-[#e78a53]/80 font-medium">
+              <Link
+                href="/signup"
+                className="text-[#e78a53] hover:text-[#e78a53]/80 font-medium"
+              >
                 Sign up
               </Link>
             </p>
@@ -204,7 +220,9 @@ export default function LoginPage() {
               <div className="w-full border-t border-zinc-800" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-black text-zinc-500">Or continue with</span>
+              <span className="px-2 bg-black text-zinc-500">
+                Or continue with
+              </span>
             </div>
           </div>
 
@@ -253,5 +271,5 @@ export default function LoginPage() {
         </motion.div>
       </motion.div>
     </div>
-  )
+  );
 }
