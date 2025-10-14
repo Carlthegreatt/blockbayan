@@ -1,26 +1,69 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
 import { useState } from "react"
 import { motion } from "framer-motion"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
+// Dummy user data
+const DUMMY_USERS = [
+  {
+    email: "admin@blockbayan.com",
+    password: "admin123",
+    name: "Admin User",
+    type: "admin"
+  },
+  {
+    email: "user@blockbayan.com",
+    password: "user123",
+    name: "John Doe",
+    type: "personal"
+  },
+  {
+    email: "org@blockbayan.com",
+    password: "org123",
+    name: "ABC Organization",
+    type: "organization"
+  }
+]
+
 export default function LoginPage() {
+  const router = useRouter()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    // Simulate login process
+    setError("")
+
+    // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // Check credentials against dummy data
+    const user = DUMMY_USERS.find(
+      (u) => u.email === email && u.password === password
+    )
+
+    if (user) {
+      console.log("Login successful:", { email: user.email, name: user.name, type: user.type })
+      // Store user data in localStorage (in production, use proper session management)
+      localStorage.setItem("user", JSON.stringify({ email: user.email, name: user.name, type: user.type }))
+      // Redirect to home page
+      router.push("/")
+    } else {
+      setError("Invalid email or password")
+      console.log("Login failed:", { email, password })
+    }
+
     setIsLoading(false)
-    console.log("[v0] Login attempt:", { email, password })
   }
 
   return (
@@ -29,8 +72,18 @@ export default function LoginPage() {
         href="/"
         className="absolute top-6 left-6 z-20 text-zinc-400 hover:text-[#e78a53] transition-colors duration-200 flex items-center space-x-2"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
         </svg>
         <span>Back to Home</span>
       </Link>
@@ -52,16 +105,11 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-6">
             <div className="flex items-center justify-center space-x-2">
-              <svg
-                fill="currentColor"
-                viewBox="0 0 147 70"
-                xmlns="http://www.w3.org/2000/svg"
-                aria-hidden="true"
-                className="text-[#e78a53] rounded-full size-8 w-8"
-              >
-                <path d="M56 50.2031V14H70V60.1562C70 65.5928 65.5928 70 60.1562 70C57.5605 70 54.9982 68.9992 53.1562 67.1573L0 14H19.7969L56 50.2031Z"></path>
-                <path d="M147 56H133V23.9531L100.953 56H133V70H96.6875C85.8144 70 77 61.1856 77 50.3125V14H91V46.1562L123.156 14H91V0H127.312C138.186 0 147 8.81439 147 19.6875V56Z"></path>
-              </svg>
+              <img
+                src="/logo.svg"
+                alt="BlockBayan Logo"
+                className="w-12 h-12"
+              />
             </div>
           </Link>
           <h1 className="text-3xl font-bold text-white mb-2">Welcome back</h1>
@@ -76,6 +124,12 @@ export default function LoginPage() {
           className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-2xl p-8"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-3 text-sm text-red-400">
+                {error}
+              </div>
+            )}
+
             <div className="space-y-2">
               <Label htmlFor="email" className="text-white">
                 Email
@@ -114,7 +168,10 @@ export default function LoginPage() {
                 />
                 <span className="text-zinc-300">Remember me</span>
               </label>
-              <Link href="#" className="text-sm text-[#e78a53] hover:text-[#e78a53]/80">
+              <Link
+                href="#"
+                className="text-sm text-[#e78a53] hover:text-[#e78a53]/80"
+              >
                 Forgot password?
               </Link>
             </div>
@@ -131,10 +188,23 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-zinc-400">
               Don't have an account?{" "}
-              <Link href="/signup" className="text-[#e78a53] hover:text-[#e78a53]/80 font-medium">
+              <Link
+                href="/signup"
+                className="text-[#e78a53] hover:text-[#e78a53]/80 font-medium"
+              >
                 Sign up
               </Link>
             </p>
+          </div>
+
+          {/* Demo Credentials */}
+          <div className="mt-6 bg-zinc-800/30 border border-zinc-700 rounded-lg p-4">
+            <p className="text-xs font-semibold text-zinc-300 mb-2">Demo Credentials:</p>
+            <div className="space-y-1 text-xs text-zinc-400">
+              <p>Admin: admin@blockbayan.com / admin123</p>
+              <p>User: user@blockbayan.com / user123</p>
+              <p>Org: org@blockbayan.com / org123</p>
+            </div>
           </div>
         </motion.div>
 
@@ -150,7 +220,9 @@ export default function LoginPage() {
               <div className="w-full border-t border-zinc-800" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-black text-zinc-500">Or continue with</span>
+              <span className="px-2 bg-black text-zinc-500">
+                Or continue with
+              </span>
             </div>
           </div>
 
@@ -199,5 +271,5 @@ export default function LoginPage() {
         </motion.div>
       </motion.div>
     </div>
-  )
+  );
 }
