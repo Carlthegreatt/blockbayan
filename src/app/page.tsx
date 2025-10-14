@@ -109,25 +109,6 @@ export default function Home() {
             className="relative px-4 py-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             onClick={(e) => {
               e.preventDefault()
-              const element = document.getElementById("pricing")
-              if (element) {
-                const headerOffset = 120 // Account for sticky header height + margin
-                const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-                const offsetPosition = elementPosition - headerOffset
-
-                window.scrollTo({
-                  top: offsetPosition,
-                  behavior: "smooth",
-                })
-              }
-            }}
-          >
-            <span className="relative z-20">Pricing</span>
-          </a>
-          <a
-            className="relative px-4 py-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-            onClick={(e) => {
-              e.preventDefault()
               const element = document.getElementById("testimonials")
               if (element) {
                 const headerOffset = 120 // Account for sticky header height + margin

@@ -3,13 +3,13 @@
 import type React from "react"
 
 import { useTheme } from "next-themes"
-import Earth from "@/components/globe"
-import ScrambleHover from "@/components/scramble"
-import { FollowerPointerCard } from "@/components/following-pointer"
-import { motion, useInView } from "framer-motion"
-import { Suspense, useEffect, useRef, useState } from "react"
-import { geist } from "@/lib/fonts"
-import { cn } from "@/lib/utils"
+import Earth from "@/components/globe";
+import ScrambleHover from "@/components/scramble";
+import { FollowerPointerCard } from "@/components/following-pointer";
+import { motion, useInView } from "framer-motion";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { geist } from "@/lib/fonts";
+import { cn } from "@/lib/utils";
 
 export default function Features() {
   const ref = useRef(null)
