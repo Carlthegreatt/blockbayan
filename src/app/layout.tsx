@@ -5,9 +5,17 @@ import { GeistMono } from "geist/font/mono"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.app",
+  title: "BlockBayan",
+  description: "",
+  generator: "",
+  icons: {
+    icon: "/logo.svg",
+    shortcut: "/logo.svg",
+    apple: "/logo.svg",
+    other: [
+      { rel: "mask-icon", url: "/logo.svg" },
+    ],
+  },
 }
 
 export default function RootLayout({
@@ -25,6 +33,10 @@ html {
   --font-mono: ${GeistMono.variable};
 }
         `}</style>
+        {/* Favicon / App Icons */}
+        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+        <link rel="shortcut icon" href="/logo.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/logo.svg" />
       </head>
       <body className="dark">{children}</body>
     </html>
