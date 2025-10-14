@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import DashboardHeader from "@/components/layout/DashboardHeader";
+import { useToast } from "@/components/ui/toast";
 import {
   Card,
   CardContent,
@@ -32,6 +33,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { generateReceipt, openInExplorer } from "@/lib/receipt-utils";
 
 // Mock campaign data
 const mockCampaignData = {
@@ -60,7 +62,7 @@ const mockDonations = [
     id: "1",
     donor: "0x742d...C2f4",
     amount: "5 ETH",
-    amountUSD: "$12,100",
+    amountUSD: "₱675,000",
     timestamp: "2025-10-14 14:30:22",
     txHash: "0xabc123...def456",
   },
@@ -68,7 +70,7 @@ const mockDonations = [
     id: "2",
     donor: "0x9f1a...B3e7",
     amount: "10 ETH",
-    amountUSD: "$24,200",
+    amountUSD: "₱1,350,000",
     timestamp: "2025-10-13 10:15:45",
     txHash: "0x789ghi...jkl012",
   },
@@ -76,7 +78,7 @@ const mockDonations = [
     id: "3",
     donor: "0x5a8c...D9f2",
     amount: "2.5 ETH",
-    amountUSD: "$6,050",
+    amountUSD: "₱337,500",
     timestamp: "2025-10-12 16:45:10",
     txHash: "0x345mno...pqr678",
   },
@@ -84,21 +86,64 @@ const mockDonations = [
 
 export default function CampaignDetailsPage() {
   const params = useParams();
+  const { showToast } = useToast();
   const [donationAmount, setDonationAmount] = useState("");
   const [showDonateModal, setShowDonateModal] = useState(false);
   const [isDonating, setIsDonating] = useState(false);
   const [donationSuccess, setDonationSuccess] = useState(false);
   const [donationTxHash, setDonationTxHash] = useState("");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const [walletBalance, setWalletBalance] = useState<string>("0.00");
+  const [campaignData, setCampaignData] = useState(mockCampaignData);
 
   useEffect(() => {
     // Check if wallet is connected
-    const walletData = localStorage.getItem("wallet");
+    const walletData = sessionStorage.getItem("wallet");
     if (walletData) {
       const { connected } = JSON.parse(walletData);
       setIsWalletConnected(connected);
+
+      // Get wallet balance from sessionStorage
+      const balance = sessionStorage.getItem("walletBalance");
+      if (balance) {
+        setWalletBalance(balance);
+      }
     }
-  }, []);
+
+    // Load campaign from sessionStorage if it exists
+    const storedCampaigns = sessionStorage.getItem("userCampaigns");
+    if (storedCampaigns && params.id) {
+      try {
+        const campaigns = JSON.parse(storedCampaigns);
+        const foundCampaign = campaigns.find((c: any) => c.id === params.id);
+        if (foundCampaign) {
+          // Map the stored campaign to the expected format
+          setCampaignData({
+            ...mockCampaignData,
+            id: foundCampaign.id,
+            title: foundCampaign.title,
+            description: foundCampaign.description,
+            category: foundCampaign.category,
+            location: foundCampaign.location || "Philippines",
+            goal: foundCampaign.goal,
+            raised: foundCampaign.raised,
+            percentage: foundCampaign.percentage,
+            deadline: foundCampaign.deadline,
+            chain: foundCampaign.chain,
+            contractAddress:
+              foundCampaign.contractAddress || mockCampaignData.contractAddress,
+            createdAt: foundCampaign.createdAt || new Date().toISOString(),
+            status: foundCampaign.status,
+            image: foundCampaign.image || mockCampaignData.image,
+            donors: foundCampaign.donors || mockCampaignData.donors,
+            verified: foundCampaign.verified || false,
+          });
+        }
+      } catch (error) {
+        console.error("Error loading campaign:", error);
+      }
+    }
+  }, [params.id]);
 
   const handleDonateClick = () => {
     if (!isWalletConnected) {
@@ -113,23 +158,46 @@ export default function CampaignDetailsPage() {
     if (!isWalletConnected) {
       return;
     }
+
+    // Check if user has enough balance
+    const totalCost = parseFloat(donationAmount) + 0.002; // Include gas fee
+    if (totalCost > parseFloat(walletBalance)) {
+      showToast("Insufficient balance for this transaction", "error");
+      return;
+    }
+
     setIsDonating(true);
     // Simulate blockchain transaction
     await new Promise((resolve) => setTimeout(resolve, 2500));
-    setDonationTxHash("0xdef456ghi789jkl012mno345pqr678stu901vwx234yz");
+
+    // Generate random transaction hash
+    const randomHex = () =>
+      Math.floor(Math.random() * 0xffffffff)
+        .toString(16)
+        .padStart(8, "0");
+    const txHash = `0x${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}`;
+
+    setDonationTxHash(txHash);
+
+    // Update wallet balance
+    const newBalance = (parseFloat(walletBalance) - totalCost).toFixed(4);
+    setWalletBalance(newBalance);
+    sessionStorage.setItem("walletBalance", newBalance);
+
     setIsDonating(false);
     setDonationSuccess(true);
   };
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
+    showToast("Copied to clipboard!");
   };
 
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: mockCampaignData.title,
-        text: mockCampaignData.description,
+        title: campaignData.title,
+        text: campaignData.description,
         url: window.location.href,
       });
     }
@@ -154,12 +222,27 @@ export default function CampaignDetailsPage() {
             {/* Campaign Image */}
             <Card className="overflow-hidden">
               <div className="aspect-video bg-muted relative">
-                <img
-                  src={mockCampaignData.image}
-                  alt={mockCampaignData.title}
-                  className="object-cover w-full h-full opacity-80"
-                />
-                {mockCampaignData.verified && (
+                {campaignData.image ? (
+                  <img
+                    src={campaignData.image}
+                    alt={campaignData.title}
+                    className="object-cover w-full h-full opacity-80"
+                    onError={(e) => {
+                      // Fallback to placeholder if image fails to load
+                      e.currentTarget.src = "/ethereum.png";
+                    }}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-primary/5">
+                    <div className="text-center">
+                      <div className="text-6xl mb-2">📋</div>
+                      <p className="text-sm text-muted-foreground">
+                        Campaign Image
+                      </p>
+                    </div>
+                  </div>
+                )}
+                {campaignData.verified && (
                   <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
                     ✓ Verified
                   </Badge>
@@ -172,23 +255,21 @@ export default function CampaignDetailsPage() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <h1 className="text-4xl font-bold mb-3">
-                    {mockCampaignData.title}
+                    {campaignData.title}
                   </h1>
                   <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                    <Badge>{mockCampaignData.category}</Badge>
+                    <Badge>{campaignData.category}</Badge>
                     <span>•</span>
                     <div className="flex items-center gap-1">
                       <MapPin className="h-4 w-4" />
-                      <span>{mockCampaignData.location}</span>
+                      <span>{campaignData.location}</span>
                     </div>
                     <span>•</span>
                     <div className="flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
                       <span>
                         Ends{" "}
-                        {new Date(
-                          mockCampaignData.deadline
-                        ).toLocaleDateString()}
+                        {new Date(campaignData.deadline).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
@@ -200,7 +281,7 @@ export default function CampaignDetailsPage() {
               </div>
 
               <p className="text-lg leading-relaxed">
-                {mockCampaignData.description}
+                {campaignData.description}
               </p>
             </div>
 
@@ -330,14 +411,14 @@ export default function CampaignDetailsPage() {
                             Contract Address
                           </p>
                           <code className="text-sm font-mono">
-                            {mockCampaignData.contractAddress}
+                            {campaignData.contractAddress}
                           </code>
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() =>
-                            copyToClipboard(mockCampaignData.contractAddress)
+                            copyToClipboard(campaignData.contractAddress)
                           }
                         >
                           <Copy className="h-4 w-4" />
@@ -349,9 +430,7 @@ export default function CampaignDetailsPage() {
                           <p className="text-sm text-muted-foreground">
                             Network
                           </p>
-                          <p className="font-semibold">
-                            {mockCampaignData.chain}
-                          </p>
+                          <p className="font-semibold">{campaignData.chain}</p>
                         </div>
                       </div>
 
@@ -361,15 +440,13 @@ export default function CampaignDetailsPage() {
                             Campaign Creator
                           </p>
                           <code className="text-sm font-mono">
-                            {mockCampaignData.creator}
+                            {campaignData.creator}
                           </code>
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() =>
-                            copyToClipboard(mockCampaignData.creator)
-                          }
+                          onClick={() => copyToClipboard(campaignData.creator)}
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -382,7 +459,7 @@ export default function CampaignDetailsPage() {
                           </p>
                           <p className="font-semibold">
                             {new Date(
-                              mockCampaignData.createdAt
+                              campaignData.createdAt
                             ).toLocaleDateString()}
                           </p>
                         </div>
@@ -408,34 +485,34 @@ export default function CampaignDetailsPage() {
                   <div>
                     <div className="flex items-center justify-between text-sm mb-2">
                       <span className="font-semibold text-2xl text-primary">
-                        {mockCampaignData.raised}
+                        {campaignData.raised}
                       </span>
                       <span className="text-muted-foreground">
-                        of {mockCampaignData.goal}
+                        of {campaignData.goal}
                       </span>
                     </div>
                     <div className="w-full bg-secondary rounded-full h-3 overflow-hidden">
                       <div
                         className="bg-primary h-full transition-all duration-300"
-                        style={{ width: `${mockCampaignData.percentage}%` }}
+                        style={{ width: `${campaignData.percentage}%` }}
                       />
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">
-                      {mockCampaignData.percentage}% funded
+                      {campaignData.percentage}% funded
                     </p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 py-4 border-y border-border">
                     <div className="space-y-1">
                       <p className="text-2xl font-bold">
-                        {mockCampaignData.donors}
+                        {campaignData.donors}
                       </p>
                       <p className="text-xs text-muted-foreground">Donors</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-2xl font-bold">
                         {Math.ceil(
-                          (new Date(mockCampaignData.deadline).getTime() -
+                          (new Date(campaignData.deadline).getTime() -
                             Date.now()) /
                             (1000 * 60 * 60 * 24)
                         )}
@@ -532,7 +609,7 @@ export default function CampaignDetailsPage() {
                       ? "Please connect your wallet to make a donation"
                       : donationSuccess
                       ? "Your contribution has been recorded on the blockchain"
-                      : `Support ${mockCampaignData.title}`}
+                      : `Support ${campaignData.title}`}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -588,6 +665,32 @@ export default function CampaignDetailsPage() {
                     </>
                   ) : !donationSuccess ? (
                     <>
+                      {/* Campaign Info */}
+                      <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                        {campaignData.image ? (
+                          <img
+                            src={campaignData.image}
+                            alt={campaignData.title}
+                            className="w-12 h-12 rounded object-cover flex-shrink-0"
+                            onError={(e) => {
+                              e.currentTarget.src = "/ethereum.png";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <span className="text-xl">📋</span>
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold truncate">
+                            {campaignData.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {campaignData.category}
+                          </p>
+                        </div>
+                      </div>
+
                       <div className="space-y-2">
                         <Label htmlFor="amount">Donation Amount (ETH)</Label>
                         <Input
@@ -598,22 +701,24 @@ export default function CampaignDetailsPage() {
                           onChange={(e) => setDonationAmount(e.target.value)}
                           disabled={isDonating}
                         />
-                        {donationAmount && (
-                          <p className="text-xs text-muted-foreground">
-                            ≈ $
-                            {(
-                              parseFloat(donationAmount) * 2420
-                            ).toLocaleString()}{" "}
-                            USD
-                          </p>
-                        )}
+                        <div className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">
+                            {donationAmount &&
+                              `≈ ₱${(
+                                parseFloat(donationAmount) * 135000
+                              ).toLocaleString()} PHP`}
+                          </span>
+                          <span className="text-muted-foreground">
+                            Balance: {walletBalance} ETH
+                          </span>
+                        </div>
                       </div>
 
                       <div className="bg-muted p-4 rounded-lg space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Network</span>
                           <span className="font-semibold">
-                            {mockCampaignData.chain}
+                            {campaignData.chain}
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -621,6 +726,17 @@ export default function CampaignDetailsPage() {
                             Gas Fee (est.)
                           </span>
                           <span className="font-semibold">~0.002 ETH</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">
+                            Total Cost
+                          </span>
+                          <span className="font-semibold">
+                            {donationAmount
+                              ? (parseFloat(donationAmount) + 0.002).toFixed(4)
+                              : "0.002"}{" "}
+                            ETH
+                          </span>
                         </div>
                       </div>
 
@@ -688,11 +804,30 @@ export default function CampaignDetailsPage() {
                       </div>
 
                       <div className="flex gap-3">
-                        <Button variant="outline" className="flex-1">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => {
+                            generateReceipt({
+                              campaign: campaignData.title,
+                              amount: donationAmount + " ETH",
+                              txHash: donationTxHash,
+                              date: new Date().toLocaleString(),
+                              to: campaignData.contractAddress,
+                            });
+                            showToast("Receipt downloaded!");
+                          }}
+                        >
                           <Download className="mr-2 h-4 w-4" />
                           Receipt
                         </Button>
-                        <Button variant="outline" className="flex-1">
+                        <Button
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() =>
+                            openInExplorer(donationTxHash, campaignData.chain)
+                          }
+                        >
                           <ExternalLink className="mr-2 h-4 w-4" />
                           Explorer
                         </Button>

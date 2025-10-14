@@ -1,8 +1,9 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { GeistSans } from "geist/font/sans"
-import { GeistMono } from "geist/font/mono"
-import "./globals.css"
+import type React from "react";
+import type { Metadata } from "next";
+import { GeistSans } from "geist/font/sans";
+import { GeistMono } from "geist/font/mono";
+import { ToastProvider } from "@/components/ui/toast";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "BlockBayan",
@@ -12,16 +13,14 @@ export const metadata: Metadata = {
     icon: "/logo.svg",
     shortcut: "/logo.svg",
     apple: "/logo.svg",
-    other: [
-      { rel: "mask-icon", url: "/logo.svg" },
-    ],
+    other: [{ rel: "mask-icon", url: "/logo.svg" }],
   },
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en" className="dark">
@@ -38,7 +37,9 @@ html {
         <link rel="shortcut icon" href="/logo.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/logo.svg" />
       </head>
-      <body className="dark">{children}</body>
+      <body className="dark">
+        <ToastProvider>{children}</ToastProvider>
+      </body>
     </html>
-  )
+  );
 }

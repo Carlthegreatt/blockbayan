@@ -59,6 +59,7 @@ export default function CreateCampaignPage() {
   const [isDeploying, setIsDeploying] = useState(false);
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [isCheckingWallet, setIsCheckingWallet] = useState(true);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -78,7 +79,7 @@ export default function CreateCampaignPage() {
 
   useEffect(() => {
     // Check if wallet is connected
-    const walletData = localStorage.getItem("wallet");
+    const walletData = sessionStorage.getItem("wallet");
     if (walletData) {
       const { connected } = JSON.parse(walletData);
       setIsWalletConnected(connected);
@@ -91,7 +92,17 @@ export default function CreateCampaignPage() {
     field: "image" | "video"
   ) => {
     if (e.target.files && e.target.files[0]) {
-      setFormData({ ...formData, [field]: e.target.files[0] });
+      const file = e.target.files[0];
+      setFormData({ ...formData, [field]: file });
+
+      // Create preview for image
+      if (field === "image") {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -99,12 +110,71 @@ export default function CreateCampaignPage() {
     setIsDeploying(true);
     // Simulate blockchain deployment
     await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    // Generate unique contract address and transaction hash for demonstration
+    const randomHex = () =>
+      Math.floor(Math.random() * 0xffffffff)
+        .toString(16)
+        .padStart(8, "0");
+    const contractAddress =
+      `0x${randomHex()}${randomHex()}${randomHex()}${randomHex()}`.slice(0, 42);
+    const transactionHash = `0x${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}`;
+    const chainId = "1";
+
     setFormData({
       ...formData,
-      contractAddress: "0x742d35Cc6634C0532925a3b844Bc9e7595C2f4",
-      transactionHash: "0xabc123def456ghi789jkl012mno345pqr678stu901vwx234yz",
-      chainId: "1",
+      contractAddress,
+      transactionHash,
+      chainId,
     });
+
+    // Convert image to base64 if present
+    let imageUrl = "/ethereum.png"; // Default placeholder
+    if (formData.image) {
+      try {
+        const reader = new FileReader();
+        imageUrl = await new Promise((resolve) => {
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(formData.image!);
+        });
+      } catch (error) {
+        console.error("Error converting image:", error);
+        imageUrl = "/ethereum.png"; // Fallback to placeholder
+      }
+    }
+
+    // Save campaign to sessionStorage for demonstration
+    const newCampaign = {
+      id: contractAddress,
+      title: formData.title,
+      description: formData.description,
+      category: formData.category,
+      location: formData.location,
+      goal: `${formData.goal} ETH`,
+      raised: "0 ETH",
+      percentage: 0,
+      status: "active",
+      deadline: formData.endDate,
+      chain: formData.chain,
+      contractAddress,
+      transactionHash,
+      createdAt: new Date().toISOString(),
+      image: imageUrl,
+      donors: 0,
+      verified: false,
+    };
+
+    // Get existing campaigns from sessionStorage
+    const existingCampaigns = JSON.parse(
+      sessionStorage.getItem("userCampaigns") || "[]"
+    );
+
+    // Add new campaign
+    existingCampaigns.push(newCampaign);
+
+    // Save back to sessionStorage
+    sessionStorage.setItem("userCampaigns", JSON.stringify(existingCampaigns));
+
     setIsDeploying(false);
     setCurrentStep("success");
   };
@@ -407,9 +477,11 @@ export default function CreateCampaignPage() {
                       />
                       {formData.goal && (
                         <p className="text-xs text-muted-foreground">
-                          ≈ $
-                          {(parseFloat(formData.goal) * 2420).toLocaleString()}{" "}
-                          USD
+                          ≈ ₱
+                          {(
+                            parseFloat(formData.goal) * 135000
+                          ).toLocaleString()}{" "}
+                          PHP
                         </p>
                       )}
                     </div>
@@ -500,21 +572,30 @@ export default function CreateCampaignPage() {
                         onChange={(e) => handleFileChange(e, "image")}
                         className="hidden"
                       />
-                      <label
-                        htmlFor="image"
-                        className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary hover:bg-accent transition-all"
-                      >
-                        {formData.image ? (
-                          <div className="text-center">
-                            <Check className="h-8 w-8 mx-auto mb-2 text-primary" />
-                            <p className="text-sm font-medium">
-                              {formData.image.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Click to change
-                            </p>
-                          </div>
-                        ) : (
+                      {imagePreview ? (
+                        <div className="relative">
+                          <img
+                            src={imagePreview}
+                            alt="Campaign preview"
+                            className="w-full h-48 object-cover rounded-lg border-2 border-border"
+                          />
+                          <label
+                            htmlFor="image"
+                            className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity cursor-pointer rounded-lg flex items-center justify-center"
+                          >
+                            <div className="text-center text-white">
+                              <Upload className="h-8 w-8 mx-auto mb-2" />
+                              <p className="text-sm font-medium">
+                                Click to change image
+                              </p>
+                            </div>
+                          </label>
+                        </div>
+                      ) : (
+                        <label
+                          htmlFor="image"
+                          className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary hover:bg-accent transition-all"
+                        >
                           <div className="text-center">
                             <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                             <p className="text-sm font-medium">
@@ -524,8 +605,8 @@ export default function CreateCampaignPage() {
                               PNG, JPG, or GIF (max 5MB)
                             </p>
                           </div>
-                        )}
-                      </label>
+                        </label>
+                      )}
                     </div>
 
                     <div className="space-y-2">
@@ -601,7 +682,13 @@ export default function CreateCampaignPage() {
 
                   <Card className="border-2">
                     <div className="aspect-video bg-muted relative overflow-hidden">
-                      {formData.image && (
+                      {imagePreview ? (
+                        <img
+                          src={imagePreview}
+                          alt={formData.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50 flex items-center justify-center">
                           <Upload className="h-12 w-12 text-white/50" />
                         </div>
@@ -764,6 +851,12 @@ export default function CreateCampaignPage() {
                       Your campaign has been successfully deployed on the
                       blockchain
                     </p>
+                    <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+                      <p className="text-sm text-green-700 dark:text-green-400">
+                        ✓ Your campaign is now live and visible in your
+                        dashboard
+                      </p>
+                    </div>
                   </div>
 
                   <Card className="border-2 border-green-500/20 text-left">

@@ -52,8 +52,8 @@ export default function LoginPage() {
         name: user.name,
         type: user.type,
       });
-      // Store user data in localStorage (in production, use proper session management)
-      localStorage.setItem(
+      // Store user data in sessionStorage (in production, use proper session management)
+      sessionStorage.setItem(
         "user",
         JSON.stringify({ email: user.email, name: user.name, type: user.type })
       );
