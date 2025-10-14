@@ -16,6 +16,7 @@ import {
   ExternalLink,
   Bell,
 } from "lucide-react";
+import WalletConnectModal from "@/components/modals/WalletConnectModal";
 
 // Mock recent transactions data
 const recentTransactions = [
@@ -54,14 +55,15 @@ export default function DashboardHeader() {
   const [isWalletDropdownOpen, setIsWalletDropdownOpen] = useState(false);
   const [isLedgerDropdownOpen, setIsLedgerDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const [isConnected, setIsConnected] = useState(true); // Simulated wallet connection
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const [isConnected, setIsConnected] = useState(false); // Wallet connection state
+  const [walletAddress, setWalletAddress] = useState<string>(""); // Connected wallet address
+  const [walletType, setWalletType] = useState<string>(""); // Type of wallet connected
   const [user, setUser] = useState<{
     email: string;
     name: string;
     type: string;
   } | null>(null);
-
-  const walletAddress = "0x742d...C2f4"; // Simulated wallet address
 
   useEffect(() => {
     // Load user data from localStorage
@@ -69,13 +71,45 @@ export default function DashboardHeader() {
     if (userData) {
       setUser(JSON.parse(userData));
     }
+
+    // Load wallet connection data from localStorage
+    const walletData = localStorage.getItem("wallet");
+    if (walletData) {
+      const { connected, address, type } = JSON.parse(walletData);
+      setIsConnected(connected);
+      setWalletAddress(address);
+      setWalletType(type);
+    }
   }, []);
+
+  const handleWalletConnect = (walletId: string, address: string) => {
+    setIsConnected(true);
+    setWalletAddress(address);
+    setWalletType(walletId);
+    setIsWalletModalOpen(false);
+
+    // Save wallet connection to localStorage
+    localStorage.setItem(
+      "wallet",
+      JSON.stringify({
+        connected: true,
+        address: address,
+        type: walletId,
+      })
+    );
+  };
 
   const handleDisconnect = () => {
     setIsConnected(false);
+    setWalletAddress("");
+    setWalletType("");
     setIsWalletDropdownOpen(false);
-    // In real app, would disconnect wallet and redirect
-    window.location.href = "/";
+
+    // Clear wallet connection from localStorage
+    localStorage.removeItem("wallet");
+
+    // Stay on current page - no redirect needed
+    // User can still browse but features requiring wallet will be disabled
   };
 
   const handleLogout = () => {
@@ -102,17 +136,18 @@ export default function DashboardHeader() {
         {/* Centered Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
           <Link
-            href="/dashboard"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Dashboard
-          </Link>
-          <Link
             href="/explore"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Explore
           </Link>
+          <Link
+            href="/dashboard"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Dashboard
+          </Link>
+
           <Link
             href="/create-campaign"
             className="text-sm font-medium text-primary hover:text-primary/80 transition-colors"
@@ -124,86 +159,6 @@ export default function DashboardHeader() {
         {/* Right Side Actions */}
         <div className="hidden md:flex items-center space-x-3">
           {/* Global Ledger Dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setIsLedgerDropdownOpen(!isLedgerDropdownOpen)}
-              className="flex items-center space-x-2 px-3 py-2 hover:bg-accent rounded-lg transition-colors relative"
-              title="Global Blockchain Ledger"
-            >
-              <List className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-4 w-4 bg-primary rounded-full text-[10px] font-bold text-primary-foreground flex items-center justify-center">
-                {recentTransactions.length}
-              </span>
-            </button>
-
-            {isLedgerDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-96 bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50">
-                <div className="px-4 py-3 border-b border-border bg-muted/50">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold">
-                      Recent Blockchain Activity
-                    </h3>
-                    <Link
-                      href="/explore?tab=transactions"
-                      className="text-xs text-primary hover:underline"
-                      onClick={() => setIsLedgerDropdownOpen(false)}
-                    >
-                      View All
-                    </Link>
-                  </div>
-                </div>
-                <div className="max-h-96 overflow-y-auto">
-                  {recentTransactions.map((tx) => (
-                    <div
-                      key={tx.id}
-                      className="px-4 py-3 border-b border-border last:border-0 hover:bg-accent transition-colors"
-                    >
-                      <div className="flex items-start justify-between mb-1">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span
-                              className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                tx.type === "donation"
-                                  ? "bg-blue-500/10 text-blue-500"
-                                  : "bg-amber-500/10 text-amber-500"
-                              }`}
-                            >
-                              {tx.type}
-                            </span>
-                            <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold bg-green-500/10 text-green-500">
-                              {tx.status}
-                            </span>
-                          </div>
-                          <p className="text-sm font-medium line-clamp-1">
-                            {tx.to}
-                          </p>
-                          <p className="text-xs text-muted-foreground font-mono">
-                            {tx.from}
-                          </p>
-                        </div>
-                        <div className="text-right ml-2">
-                          <p className="text-sm font-bold">{tx.amount}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {tx.time}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="px-4 py-3 border-t border-border bg-muted/50">
-                  <Link
-                    href="/explore?tab=transactions"
-                    onClick={() => setIsLedgerDropdownOpen(false)}
-                    className="flex items-center justify-center text-sm text-primary hover:underline font-medium"
-                  >
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    View Full Ledger
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* Profile Dropdown */}
           <div className="relative">
@@ -299,6 +254,9 @@ export default function DashboardHeader() {
                     <p className="text-sm font-mono font-semibold">
                       {walletAddress}
                     </p>
+                    <p className="text-xs text-muted-foreground mt-1 capitalize">
+                      via {walletType}
+                    </p>
                   </div>
                   <div className="py-1">
                     <button
@@ -313,7 +271,10 @@ export default function DashboardHeader() {
               )}
             </div>
           ) : (
-            <Button className="bg-primary hover:bg-primary/90">
+            <Button
+              onClick={() => setIsWalletModalOpen(true)}
+              className="bg-primary hover:bg-primary/90"
+            >
               <Wallet className="mr-2 h-4 w-4" />
               Connect Wallet
             </Button>
@@ -431,7 +392,13 @@ export default function DashboardHeader() {
                   </button>
                 </>
               ) : (
-                <Button className="w-full bg-primary hover:bg-primary/90 mb-2">
+                <Button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setIsWalletModalOpen(true);
+                  }}
+                  className="w-full bg-primary hover:bg-primary/90 mb-2"
+                >
                   <Wallet className="mr-2 h-4 w-4" />
                   Connect Wallet
                 </Button>
@@ -453,6 +420,13 @@ export default function DashboardHeader() {
           </nav>
         </div>
       )}
+
+      {/* Wallet Connect Modal */}
+      <WalletConnectModal
+        isOpen={isWalletModalOpen}
+        onClose={() => setIsWalletModalOpen(false)}
+        onConnect={handleWalletConnect}
+      />
     </header>
   );
 }
