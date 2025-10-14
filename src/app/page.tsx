@@ -249,12 +249,12 @@ export default function Home() {
         <Features />
       </div>
 
+      <NewReleasePromo />
+
       {/* Testimonials Section */}
       <div id="testimonials">
         <TestimonialsSection />
       </div>
-
-      <NewReleasePromo />
 
       {/* FAQ Section */}
       <div id="faq">
