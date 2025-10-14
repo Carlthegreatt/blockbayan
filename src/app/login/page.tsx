@@ -13,12 +13,6 @@ import { Label } from "@/components/ui/label";
 // Dummy user data
 const DUMMY_USERS = [
   {
-    email: "admin@blockbayan.com",
-    password: "admin123",
-    name: "Admin User",
-    type: "admin",
-  },
-  {
     email: "user@blockbayan.com",
     password: "user123",
     name: "John Doe",
@@ -210,7 +204,6 @@ export default function LoginPage() {
               Demo Credentials:
             </p>
             <div className="space-y-1 text-xs text-zinc-400">
-              <p>Admin: admin@blockbayan.com / admin123</p>
               <p>User: user@blockbayan.com / user123</p>
               <p>Org: org@blockbayan.com / org123</p>
             </div>
