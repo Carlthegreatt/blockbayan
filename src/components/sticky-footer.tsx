@@ -53,53 +53,29 @@ export function StickyFooter() {
                 <li
                   className="hover:underline cursor-pointer transition-colors"
                   style={{ color: "#121113" }}
-                  onMouseEnter={(e) => (e.target.style.color = "rgba(18, 17, 19, 0.8)")}
-                  onMouseLeave={(e) => (e.target.style.color = "#121113")}
+                  onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "rgba(18, 17, 19, 0.8)")}
+                  onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "#121113")}
                 >
                   Home
                 </li>
                 <li
                   className="hover:underline cursor-pointer transition-colors"
                   style={{ color: "#121113" }}
-                  onMouseEnter={(e) => (e.target.style.color = "rgba(18, 17, 19, 0.8)")}
-                  onMouseLeave={(e) => (e.target.style.color = "#121113")}
+                  onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "rgba(18, 17, 19, 0.8)")}
+                  onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "#121113")}
                 >
                   Docs
                 </li>
                 <li
                   className="hover:underline cursor-pointer transition-colors"
                   style={{ color: "#121113" }}
-                  onMouseEnter={(e) => (e.target.style.color = "rgba(18, 17, 19, 0.8)")}
-                  onMouseLeave={(e) => (e.target.style.color = "#121113")}
+                  onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "rgba(18, 17, 19, 0.8)")}
+                  onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "#121113")}
                 >
                   Components
                 </li>
               </ul>
               <ul className="space-y-2">
-                <li
-                  className="hover:underline cursor-pointer transition-colors"
-                  style={{ color: "#121113" }}
-                  onMouseEnter={(e) => (e.target.style.color = "rgba(18, 17, 19, 0.8)")}
-                  onMouseLeave={(e) => (e.target.style.color = "#121113")}
-                >
-                  Github
-                </li>
-                <li
-                  className="hover:underline cursor-pointer transition-colors"
-                  style={{ color: "#121113" }}
-                  onMouseEnter={(e) => (e.target.style.color = "rgba(18, 17, 19, 0.8)")}
-                  onMouseLeave={(e) => (e.target.style.color = "#121113")}
-                >
-                  Twitter
-                </li>
-                <li
-                  className="hover:underline cursor-pointer transition-colors"
-                  style={{ color: "#121113" }}
-                  onMouseEnter={(e) => (e.target.style.color = "rgba(18, 17, 19, 0.8)")}
-                  onMouseLeave={(e) => (e.target.style.color = "#121113")}
-                >
-                  Discord
-                </li>
               </ul>
             </motion.div>
             <motion.h2
