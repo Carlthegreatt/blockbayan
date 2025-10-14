@@ -16,7 +16,6 @@ import {
   ExternalLink,
   Bell,
 } from "lucide-react";
-import WalletConnectModal from "@/components/modals/WalletConnectModal";
 
 // Mock recent transactions data
 const recentTransactions = [
@@ -49,16 +48,29 @@ const recentTransactions = [
   },
 ];
 
-export default function DashboardHeader() {
+interface DashboardHeaderProps {
+  onOpenWalletModal?: () => void;
+  isConnected?: boolean;
+  walletAddress?: string;
+  walletType?: string;
+  onDisconnect?: () => void;
+}
+
+export default function DashboardHeader({
+  onOpenWalletModal,
+  isConnected: externalIsConnected,
+  walletAddress: externalWalletAddress,
+  walletType: externalWalletType,
+  onDisconnect: externalOnDisconnect,
+}: DashboardHeaderProps = {}) {
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isWalletDropdownOpen, setIsWalletDropdownOpen] = useState(false);
   const [isLedgerDropdownOpen, setIsLedgerDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
-  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
-  const [isConnected, setIsConnected] = useState(false); // Wallet connection state
-  const [walletAddress, setWalletAddress] = useState<string>(""); // Connected wallet address
-  const [walletType, setWalletType] = useState<string>(""); // Type of wallet connected
+  const [isConnected, setIsConnected] = useState(externalIsConnected || false);
+  const [walletAddress, setWalletAddress] = useState<string>(externalWalletAddress || "");
+  const [walletType, setWalletType] = useState<string>(externalWalletType || "");
   const [user, setUser] = useState<{
     email: string;
     name: string;
@@ -72,44 +84,43 @@ export default function DashboardHeader() {
       setUser(JSON.parse(userData));
     }
 
-    // Load wallet connection data from localStorage
-    const walletData = localStorage.getItem("wallet");
-    if (walletData) {
-      const { connected, address, type } = JSON.parse(walletData);
-      setIsConnected(connected);
-      setWalletAddress(address);
-      setWalletType(type);
+    // Load wallet connection data from localStorage if not provided via props
+    if (!externalIsConnected) {
+      const walletData = localStorage.getItem("wallet");
+      if (walletData) {
+        const { connected, address, type } = JSON.parse(walletData);
+        setIsConnected(connected);
+        setWalletAddress(address);
+        setWalletType(type);
+      }
     }
-  }, []);
+  }, [externalIsConnected]);
 
-  const handleWalletConnect = (walletId: string, address: string) => {
-    setIsConnected(true);
-    setWalletAddress(address);
-    setWalletType(walletId);
-    setIsWalletModalOpen(false);
-
-    // Save wallet connection to localStorage
-    localStorage.setItem(
-      "wallet",
-      JSON.stringify({
-        connected: true,
-        address: address,
-        type: walletId,
-      })
-    );
-  };
+  // Sync with external props
+  useEffect(() => {
+    if (externalIsConnected !== undefined) {
+      setIsConnected(externalIsConnected);
+    }
+    if (externalWalletAddress !== undefined) {
+      setWalletAddress(externalWalletAddress);
+    }
+    if (externalWalletType !== undefined) {
+      setWalletType(externalWalletType);
+    }
+  }, [externalIsConnected, externalWalletAddress, externalWalletType]);
 
   const handleDisconnect = () => {
-    setIsConnected(false);
-    setWalletAddress("");
-    setWalletType("");
-    setIsWalletDropdownOpen(false);
+    if (externalOnDisconnect) {
+      externalOnDisconnect();
+    } else {
+      setIsConnected(false);
+      setWalletAddress("");
+      setWalletType("");
+      setIsWalletDropdownOpen(false);
 
-    // Clear wallet connection from localStorage
-    localStorage.removeItem("wallet");
-
-    // Stay on current page - no redirect needed
-    // User can still browse but features requiring wallet will be disabled
+      // Clear wallet connection from localStorage
+      localStorage.removeItem("wallet");
+    }
   };
 
   const handleLogout = () => {
@@ -272,7 +283,7 @@ export default function DashboardHeader() {
             </div>
           ) : (
             <Button
-              onClick={() => setIsWalletModalOpen(true)}
+              onClick={() => onOpenWalletModal && onOpenWalletModal()}
               className="bg-primary hover:bg-primary/90"
             >
               <Wallet className="mr-2 h-4 w-4" />
@@ -395,7 +406,7 @@ export default function DashboardHeader() {
                 <Button
                   onClick={() => {
                     setIsMobileMenuOpen(false);
-                    setIsWalletModalOpen(true);
+                    onOpenWalletModal && onOpenWalletModal();
                   }}
                   className="w-full bg-primary hover:bg-primary/90 mb-2"
                 >
@@ -420,13 +431,6 @@ export default function DashboardHeader() {
           </nav>
         </div>
       )}
-
-      {/* Wallet Connect Modal */}
-      <WalletConnectModal
-        isOpen={isWalletModalOpen}
-        onClose={() => setIsWalletModalOpen(false)}
-        onConnect={handleWalletConnect}
-      />
     </header>
   );
 }
