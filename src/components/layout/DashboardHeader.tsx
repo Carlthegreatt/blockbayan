@@ -182,7 +182,7 @@ export default function DashboardHeader({
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4 max-w-7xl">
           {/* Logo */}
-          <Link href="/dashboard" className="flex items-center space-x-2">
+          <Link href="/dashboard" className="flex items-center space-x-2 flex-shrink-0">
             <img
               src="/logo.svg"
               alt="BlockBayan Logo"
@@ -193,24 +193,57 @@ export default function DashboardHeader({
             </span>
           </Link>
 
-          {/* Centered Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
+          {/* Medium Screen Navigation */}
+          <nav className="hidden md:flex lg:hidden items-center space-x-3 absolute left-1/2 transform -translate-x-1/2">
             <Link
               href="/explore"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground px-3 py-2 rounded-md hover:bg-accent transition-colors"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground px-2 py-2 rounded-md hover:bg-accent transition-colors"
             >
               Explore
             </Link>
             <Link
               href="/dashboard"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground px-3 py-2 rounded-md hover:bg-accent transition-colors"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground px-2 py-2 rounded-md hover:bg-accent transition-colors"
             >
               Dashboard
             </Link>
-
+            <Link
+              href="/voting"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground px-2 py-2 rounded-md hover:bg-accent transition-colors"
+            >
+              Voting
+            </Link>
             <Link
               href="/create-campaign"
-              className="text-sm font-medium text-primary hover:text-primary/80 px-3 py-2 rounded-md hover:bg-primary/10 transition-colors"
+              className="text-sm font-medium text-primary hover:text-primary/80 px-2 py-2 rounded-md hover:bg-primary/10 transition-colors"
+            >
+              Start
+            </Link>
+          </nav>
+
+          {/* Large Screen Navigation */}
+          <nav className="hidden lg:flex items-center space-x-4 absolute left-1/2 transform -translate-x-1/2">
+            <Link
+              href="/explore"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground px-3 py-2 rounded-md hover:bg-accent transition-colors whitespace-nowrap"
+            >
+              Explore
+            </Link>
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground px-3 py-2 rounded-md hover:bg-accent transition-colors whitespace-nowrap"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/voting"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground px-3 py-2 rounded-md hover:bg-accent transition-colors whitespace-nowrap"
+            >
+              Community Voting
+            </Link>
+            <Link
+              href="/create-campaign"
+              className="text-sm font-medium text-primary hover:text-primary/80 px-3 py-2 rounded-md hover:bg-primary/10 transition-colors whitespace-nowrap"
             >
               Start Campaign
             </Link>
@@ -410,6 +443,13 @@ export default function DashboardHeader({
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Explore
+              </Link>
+              <Link
+                href="/voting"
+                className="block px-4 py-2 text-sm font-medium rounded-lg hover:bg-accent transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Community Voting
               </Link>
               <Link
                 href="/explore?tab=transactions"
