@@ -19,28 +19,25 @@ export default function Hero() {
     const driverObj = driver({
       showProgress: true,
       animate: true,
+      smoothScroll: false, // Disable native smooth scrolling
+      onHighlightStarted: (element) => {
+        if (element) {
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          const offsetPosition = elementPosition - 120; // Adjust for sticky header
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth",
+          });
+        }
+        driverObj.refresh();
+      },
       steps: [
         {
           element: "#main-title",
           popover: {
             title: "Welcome to Blockbayan",
             description: "Transparency meets Bayanihan. Our mission is to bring trust and collaboration to the forefront.",
-            onNextClick: () => {
-              const nextElement = document.querySelector("#features");
-              if (nextElement) {
-                const elementPosition = nextElement.getBoundingClientRect().top + window.pageYOffset;
-                const offsetPosition = elementPosition - 120; // Adjust for sticky header
-
-                window.scrollTo({
-                  top: offsetPosition,
-                  behavior: "smooth",
-                });
-
-                setTimeout(() => {
-                  driverObj.moveNext();
-                }, 500); // Adjust timeout to match scroll duration
-              }
-            },
           },
         },
         {
@@ -48,22 +45,6 @@ export default function Hero() {
           popover: {
             title: "Features",
             description: "Discover the powerful features that make Blockbayan unique.",
-            onNextClick: () => {
-              const nextElement = document.querySelector("#testimonials");
-              if (nextElement) {
-                const elementPosition = nextElement.getBoundingClientRect().top + window.pageYOffset;
-                const offsetPosition = elementPosition - 120;
-
-                window.scrollTo({
-                  top: offsetPosition,
-                  behavior: "smooth",
-                });
-
-                setTimeout(() => {
-                  driverObj.moveNext();
-                }, 500);
-              }
-            },
           },
         },
         {
@@ -71,22 +52,6 @@ export default function Hero() {
           popover: {
             title: "Testimonials",
             description: "See what our users have to say about their experience.",
-            onNextClick: () => {
-              const nextElement = document.querySelector("#faq");
-              if (nextElement) {
-                const elementPosition = nextElement.getBoundingClientRect().top + window.pageYOffset;
-                const offsetPosition = elementPosition - 120;
-
-                window.scrollTo({
-                  top: offsetPosition,
-                  behavior: "smooth",
-                });
-
-                setTimeout(() => {
-                  driverObj.moveNext();
-                }, 500);
-              }
-            },
           },
         },
         {
