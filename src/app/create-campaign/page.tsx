@@ -874,10 +874,22 @@ export default function CreateCampaignPage() {
                           Contract Address
                         </p>
                         <div className="flex items-center gap-2">
-                          <code className="text-sm font-mono bg-muted px-2 py-1 rounded">
-                            {formData.contractAddress}
+                          <code
+                            className="text-sm font-mono bg-muted px-2 py-1 rounded cursor-help flex-1 truncate"
+                            title={formData.contractAddress}
+                          >
+                            {formData.contractAddress.slice(0, 12)}...
+                            {formData.contractAddress.slice(-10)}
                           </code>
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              navigator.clipboard.writeText(
+                                formData.contractAddress
+                              )
+                            }
+                          >
                             <Copy className="h-4 w-4" />
                           </Button>
                         </div>
@@ -887,10 +899,23 @@ export default function CreateCampaignPage() {
                           Transaction Hash
                         </p>
                         <div className="flex items-center gap-2">
-                          <code className="text-sm font-mono bg-muted px-2 py-1 rounded truncate">
-                            {formData.transactionHash}
+                          <code
+                            className="text-sm font-mono bg-muted px-2 py-1 rounded cursor-help flex-1 truncate"
+                            title={formData.transactionHash}
+                          >
+                            {formData.transactionHash.slice(0, 12)}...
+                            {formData.transactionHash.slice(-10)}
                           </code>
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              window.open(
+                                `https://etherscan.io/tx/${formData.transactionHash}`,
+                                "_blank"
+                              )
+                            }
+                          >
                             <ExternalLink className="h-4 w-4" />
                           </Button>
                         </div>

@@ -102,7 +102,8 @@ const mockCampaignsData: { [key: string]: any } = {
     deadline: "2025-12-15",
     chain: "Polygon",
     location: "Visayas, Philippines",
-    image: "https://files01.pna.gov.ph/category-list/2024/10/01/batac-flooding.jpg",
+    image:
+      "https://files01.pna.gov.ph/category-list/2024/10/01/batac-flooding.jpg",
     contractAddress: "0x9f1a35Dd7845D1643936b4c955Bc8f9a7685B3e7",
     creator: {
       name: "Red Cross PH",
@@ -127,7 +128,8 @@ const mockCampaignsData: { [key: string]: any } = {
     deadline: "2025-12-30",
     chain: "Ethereum",
     location: "Luzon, Philippines",
-    image: "https://cdn.prod.website-files.com/6287850a0485ea045a5e0ce2/632899ca01c83a6de49e07b2_WATER%20FOR%20WATERLESS.jpg",
+    image:
+      "https://cdn.prod.website-files.com/6287850a0485ea045a5e0ce2/632899ca01c83a6de49e07b2_WATER%20FOR%20WATERLESS.jpg",
     contractAddress: "0x7b4e28Ff9123E5789abcd4f655Cc91a8D3e2C1a8",
     creator: {
       name: "Juan Dela Cruz",
@@ -152,7 +154,8 @@ const mockCampaignsData: { [key: string]: any } = {
     deadline: "2026-01-15",
     chain: "Base",
     location: "Cordillera, Philippines",
-    image: "https://www.scout.org/sites/default/files/styles/social_media/public/d7/news_pictures/3_344.jpg.webp?itok=qBWXYAuF",
+    image:
+      "https://www.scout.org/sites/default/files/styles/social_media/public/d7/news_pictures/3_344.jpg.webp?itok=qBWXYAuF",
     contractAddress: "0x6c8e91Ba2456C7890defg1h234Ee56f7E2d4A8b9",
     creator: {
       name: "Apo Foundation",
@@ -251,7 +254,8 @@ export default function CampaignDetailsPage() {
             deadline: foundCampaign.deadline,
             chain: foundCampaign.chain,
             contractAddress:
-              foundCampaign.contractAddress || mockCampaignsData["1"].contractAddress,
+              foundCampaign.contractAddress ||
+              mockCampaignsData["1"].contractAddress,
             createdAt: foundCampaign.createdAt || new Date().toISOString(),
             status: foundCampaign.status,
             image: foundCampaign.image || mockCampaignsData["1"].image,
@@ -494,7 +498,12 @@ export default function CampaignDetailsPage() {
                               className="hover:bg-muted/50 transition-colors"
                             >
                               <td className="px-6 py-4 font-mono text-sm">
-                                {donation.donor}
+                                <span
+                                  title={donation.donor}
+                                  className="cursor-help"
+                                >
+                                  {donation.donor}
+                                </span>
                               </td>
                               <td className="px-6 py-4">
                                 <div className="space-y-1">
@@ -510,9 +519,18 @@ export default function CampaignDetailsPage() {
                                 {donation.timestamp}
                               </td>
                               <td className="px-6 py-4">
-                                <button className="flex items-center justify-end w-full font-mono text-sm text-primary hover:underline">
-                                  {donation.txHash}
-                                  <ExternalLink className="ml-1 h-3 w-3" />
+                                <button
+                                  title={donation.txHash}
+                                  className="flex items-center justify-end w-full font-mono text-sm text-primary hover:underline group"
+                                >
+                                  <span className="group-hover:hidden">
+                                    {donation.txHash.slice(0, 10)}...
+                                    {donation.txHash.slice(-8)}
+                                  </span>
+                                  <span className="hidden group-hover:inline">
+                                    {donation.txHash}
+                                  </span>
+                                  <ExternalLink className="ml-1 h-3 w-3 flex-shrink-0" />
                                 </button>
                               </td>
                             </tr>
@@ -573,12 +591,16 @@ export default function CampaignDetailsPage() {
                   <CardContent className="space-y-4">
                     <div className="space-y-3">
                       <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-                        <div className="space-y-1">
+                        <div className="space-y-1 min-w-0 flex-1">
                           <p className="text-sm text-muted-foreground">
                             Contract Address
                           </p>
-                          <code className="text-sm font-mono">
-                            {campaignData.contractAddress}
+                          <code
+                            className="text-sm font-mono cursor-help block truncate"
+                            title={campaignData.contractAddress}
+                          >
+                            {campaignData.contractAddress.slice(0, 12)}...
+                            {campaignData.contractAddress.slice(-10)}
                           </code>
                         </div>
                         <Button
@@ -587,6 +609,7 @@ export default function CampaignDetailsPage() {
                           onClick={() =>
                             copyToClipboard(campaignData.contractAddress)
                           }
+                          className="flex-shrink-0"
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -602,11 +625,14 @@ export default function CampaignDetailsPage() {
                       </div>
 
                       <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
-                        <div className="space-y-1">
+                        <div className="space-y-1 min-w-0 flex-1">
                           <p className="text-sm text-muted-foreground">
                             Campaign Creator
                           </p>
-                          <code className="text-sm font-mono">
+                          <code
+                            className="text-sm font-mono cursor-help block"
+                            title={campaignData.creator}
+                          >
                             {campaignData.creator}
                           </code>
                         </div>
@@ -614,6 +640,7 @@ export default function CampaignDetailsPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => copyToClipboard(campaignData.creator)}
+                          className="flex-shrink-0"
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -971,7 +998,9 @@ export default function CampaignDetailsPage() {
                         <div className="flex justify-between text-xs">
                           <span className="text-muted-foreground">
                             {donationAmount &&
-                              `≈ $${ethToUSD(donationAmount)} USD / ₱${ethToPHP(donationAmount)} PHP`}
+                              `≈ $${ethToUSD(donationAmount)} USD / ₱${ethToPHP(
+                                donationAmount
+                              )} PHP`}
                           </span>
                           <span className="text-muted-foreground">
                             Balance: {walletBalance} ETH
@@ -1054,13 +1083,18 @@ export default function CampaignDetailsPage() {
                             Transaction Hash
                           </p>
                           <div className="flex items-center gap-2">
-                            <code className="text-xs font-mono truncate">
-                              {donationTxHash}
+                            <code
+                              className="text-xs font-mono cursor-help flex-1 min-w-0"
+                              title={donationTxHash}
+                            >
+                              {donationTxHash.slice(0, 12)}...
+                              {donationTxHash.slice(-10)}
                             </code>
                             <Button
                               variant="ghost"
                               size="sm"
                               onClick={() => copyToClipboard(donationTxHash)}
+                              className="flex-shrink-0"
                             >
                               <Copy className="h-3 w-3" />
                             </Button>

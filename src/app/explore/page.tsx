@@ -221,6 +221,7 @@ export default function ExplorePage() {
   const [campaigns, setCampaigns] = useState(mockCampaigns);
   const [selectedCategory, setSelectedCategory] =
     useState<string>("All Categories");
+  const [transactions, setTransactions] = useState<any[]>([]);
 
   useEffect(() => {
     // Load user campaigns from sessionStorage and merge with mock campaigns
@@ -243,6 +244,12 @@ export default function ExplorePage() {
         setCampaigns(mockCampaigns);
       }
     }
+
+    // Load transactions from wallet store
+    const realTransactions = getTransactions();
+    // Combine real transactions with mock transactions for better display
+    const combined = [...realTransactions, ...mockTransactions];
+    setTransactions(combined);
   }, []);
 
   // Filter campaigns based on search and category
@@ -653,7 +660,7 @@ export default function ExplorePage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                      {mockTransactions.map((tx) => (
+                      {transactions.map((tx) => (
                         <tr
                           key={tx.id}
                           className="hover:bg-muted/50 transition-colors"
@@ -690,10 +697,14 @@ export default function ExplorePage() {
                             </Badge>
                           </td>
                           <td className="px-6 py-4 font-mono text-sm">
-                            {tx.from}
+                            <span title={tx.from} className="cursor-help">
+                              {tx.from}
+                            </span>
                           </td>
                           <td className="px-6 py-4 font-mono text-sm">
-                            {tx.to}
+                            <span title={tx.to} className="cursor-help">
+                              {tx.to}
+                            </span>
                           </td>
                           <td className="px-6 py-4">
                             <div className="space-y-1">
@@ -716,10 +727,16 @@ export default function ExplorePage() {
                               onClick={() =>
                                 openInExplorer(tx.txHash, tx.chain)
                               }
-                              className="flex items-center justify-end w-full font-mono text-sm text-primary hover:underline"
+                              title={tx.txHash}
+                              className="flex items-center justify-end w-full font-mono text-sm text-primary hover:underline group"
                             >
-                              {tx.txHash}
-                              <ExternalLink className="ml-1 h-3 w-3" />
+                              <span className="group-hover:hidden">
+                                {tx.txHash.slice(0, 10)}...{tx.txHash.slice(-8)}
+                              </span>
+                              <span className="hidden group-hover:inline">
+                                {tx.txHash}
+                              </span>
+                              <ExternalLink className="ml-1 h-3 w-3 flex-shrink-0" />
                             </button>
                           </td>
                         </tr>
