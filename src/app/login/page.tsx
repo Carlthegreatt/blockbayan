@@ -13,14 +13,14 @@ import { Label } from "@/components/ui/label";
 // Dummy user data
 const DUMMY_USERS = [
   {
-    email: "user@blockbayan.com",
-    password: "user123",
-    name: "John Doe",
+    email: "blancaflorcarlferros@gmail.com",
+    password: "09082005",
+    name: "Carl Blancaflor",
     type: "personal",
   },
   {
-    email: "org@blockbayan.com",
-    password: "org123",
+    email: "ezekiel@gmail.com",
+    password: "ezek",
     name: "ABC Organization",
     type: "organization",
   },
@@ -196,17 +196,6 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </p>
-          </div>
-
-          {/* Demo Credentials */}
-          <div className="mt-6 bg-zinc-800/30 border border-zinc-700 rounded-lg p-4">
-            <p className="text-xs font-semibold text-zinc-300 mb-2">
-              Demo Credentials:
-            </p>
-            <div className="space-y-1 text-xs text-zinc-400">
-              <p>User: user@blockbayan.com / user123</p>
-              <p>Org: org@blockbayan.com / org123</p>
-            </div>
           </div>
         </motion.div>
 
