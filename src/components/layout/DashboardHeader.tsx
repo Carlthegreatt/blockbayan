@@ -18,6 +18,13 @@ import {
 } from "lucide-react";
 import WalletConnectModal from "@/components/modals/WalletConnectModal";
 import SettingsModal from "@/components/modals/SettingsModal";
+import ETHPriceTicker from "@/components/ETHPriceTicker";
+import {
+  getWalletData,
+  saveWalletData,
+  disconnectWallet,
+  ethToPHP,
+} from "@/store/walletStore";
 
 // Mock recent transactions data
 const recentTransactions = [
@@ -67,8 +74,6 @@ export default function DashboardHeader({
 }: DashboardHeaderProps = {}) {
   const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isWalletDropdownOpen, setIsWalletDropdownOpen] = useState(false);
-  const [isLedgerDropdownOpen, setIsLedgerDropdownOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -93,26 +98,17 @@ export default function DashboardHeader({
       setUser(JSON.parse(userData));
     }
 
-    // Load wallet connection data from sessionStorage
-    const walletData = sessionStorage.getItem("wallet");
-    if (walletData) {
-      const { connected, address, type } = JSON.parse(walletData);
-      setIsConnected(connected);
-      setWalletAddress(address);
-      setWalletType(type);
-
-      // Get or generate wallet balance for demonstration
-      let balance = sessionStorage.getItem("walletBalance");
-      if (!balance) {
-        // Generate initial balance (between 5 and 15 ETH)
-        balance = (Math.random() * 10 + 5).toFixed(4);
-        sessionStorage.setItem("walletBalance", balance);
-      }
-      setWalletBalance(balance);
+    // Load wallet connection data using wallet store
+    const wallet = getWalletData();
+    if (wallet && wallet.connected) {
+      setIsConnected(wallet.connected);
+      setWalletAddress(wallet.address);
+      setWalletType(wallet.type);
+      setWalletBalance(wallet.balance);
     }
 
     // Also check localStorage if not provided via props
-    if (!externalIsConnected) {
+    if (!externalIsConnected && !wallet) {
       const walletData = localStorage.getItem("wallet");
       if (walletData) {
         const { connected, address, type } = JSON.parse(walletData);
@@ -133,19 +129,17 @@ export default function DashboardHeader({
     let balance = sessionStorage.getItem("walletBalance");
     if (!balance) {
       balance = (Math.random() * 10 + 5).toFixed(4);
-      sessionStorage.setItem("walletBalance", balance);
     }
     setWalletBalance(balance);
 
-    // Save wallet connection to sessionStorage
-    sessionStorage.setItem(
-      "wallet",
-      JSON.stringify({
-        connected: true,
-        address: address,
-        type: walletId,
-      })
-    );
+    // Save wallet connection using wallet store
+    saveWalletData({
+      connected: true,
+      address: address,
+      type: walletId,
+      balance: balance,
+      network: "Ethereum",
+    });
   };
 
   // Sync with external props
@@ -169,12 +163,9 @@ export default function DashboardHeader({
       setWalletAddress("");
       setWalletType("");
       setWalletBalance("0.00");
-      setIsWalletDropdownOpen(false);
 
-      // Clear wallet connection from sessionStorage
-      sessionStorage.removeItem("wallet");
-      // Also clear from localStorage
-      localStorage.removeItem("wallet");
+      // Disconnect wallet using wallet store
+      disconnectWallet();
     }
   };
 
@@ -226,8 +217,11 @@ export default function DashboardHeader({
           </nav>
 
           {/* Right Side Actions */}
-          <div className="hidden md:flex items-center space-x-3">
-            {/* Global Ledger Dropdown */}
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-3">
+            {/* ETH Price Ticker - Hidden on md, shown on lg */}
+            <div className="hidden lg:block">
+              <ETHPriceTicker />
+            </div>
 
             {/* Profile Dropdown */}
             <div className="relative">
@@ -299,6 +293,62 @@ export default function DashboardHeader({
                     </button>
                   </div>
                   <div className="border-t border-border py-1">
+                    {/* Wallet Section */}
+                    {isConnected ? (
+                      <div className="px-4 py-3 bg-muted/30">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-xs text-muted-foreground">
+                            Wallet Connected
+                          </p>
+                          <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                        </div>
+                        <p className="text-xs font-mono font-semibold truncate">
+                          {walletAddress}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1 capitalize">
+                          via {walletType}
+                        </p>
+                        <div className="mt-3 pt-3 border-t border-border">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">
+                              Balance
+                            </span>
+                            <span className="text-sm font-bold text-primary">
+                              {walletBalance} ETH
+                            </span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            ≈ ₱{ethToPHP(walletBalance)} PHP
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setIsProfileDropdownOpen(false);
+                            handleDisconnect();
+                          }}
+                          className="flex items-center justify-center w-full px-3 py-2 mt-3 text-xs text-destructive hover:bg-destructive/10 rounded-md transition-colors border border-destructive/20"
+                        >
+                          <LogOut className="mr-2 h-3 w-3" />
+                          Disconnect Wallet
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="px-4 py-3">
+                        <button
+                          onClick={() => {
+                            setIsProfileDropdownOpen(false);
+                            setIsWalletModalOpen(true);
+                          }}
+                          className="flex items-center justify-center w-full px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition-colors text-sm font-medium"
+                        >
+                          <Wallet className="mr-2 h-4 w-4" />
+                          Connect Wallet
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="border-t border-border py-1">
                     <button
                       onClick={handleLogout}
                       className="flex items-center w-full px-4 py-2 text-sm text-destructive hover:bg-accent transition-colors"
@@ -310,71 +360,6 @@ export default function DashboardHeader({
                 </div>
               )}
             </div>
-
-            {/* Wallet Connection */}
-            {isConnected ? (
-              <div className="relative">
-                <button
-                  type="button"
-                  aria-haspopup="menu"
-                  aria-expanded={isWalletDropdownOpen}
-                  onClick={() => setIsWalletDropdownOpen(!isWalletDropdownOpen)}
-                  className="flex min-w-0 items-center space-x-2 px-4 py-2 bg-primary/10 hover:bg-primary/20 rounded-lg transition-all border border-primary/20 outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] hover:shadow-xs"
-                >
-                  <Wallet className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-medium font-mono truncate max-w-[120px]">
-                    {walletAddress}
-                  </span>
-                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                </button>
-
-                {isWalletDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-background border border-border rounded-lg shadow-lg overflow-hidden z-50">
-                    <div className="px-4 py-3 border-b border-border">
-                      <p className="text-xs text-muted-foreground">
-                        Connected Wallet
-                      </p>
-                      <p className="text-sm font-mono font-semibold">
-                        {walletAddress}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1 capitalize">
-                        via {walletType}
-                      </p>
-                    </div>
-                    <div className="px-4 py-3 border-b border-border bg-muted/30">
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Balance
-                      </p>
-                      <p className="text-lg font-bold text-primary">
-                        {walletBalance} ETH
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        ≈ ₱
-                        {(parseFloat(walletBalance) * 135000).toLocaleString()}{" "}
-                        PHP
-                      </p>
-                    </div>
-                    <div className="py-1">
-                      <button
-                        onClick={handleDisconnect}
-                        className="flex items-center w-full px-4 py-2 text-sm text-destructive hover:bg-muted transition-colors"
-                      >
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Disconnect Wallet
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Button
-                onClick={() => setIsWalletModalOpen(true)}
-                className="bg-primary hover:bg-primary/90"
-              >
-                <Wallet className="mr-2 h-4 w-4" />
-                Connect Wallet
-              </Button>
-            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -476,36 +461,44 @@ export default function DashboardHeader({
               </div>
 
               <div className="border-t border-border pt-3 mt-3">
+                {/* Wallet Section - Mobile */}
                 {isConnected ? (
-                  <>
-                    <div className="px-4 py-3 bg-muted/50 rounded-lg mb-2">
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Wallet Balance
+                  <div className="px-4 py-3 bg-muted/50 rounded-lg mb-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs text-muted-foreground">
+                        Wallet Connected
                       </p>
-                      <p className="text-sm font-bold text-primary">
-                        {walletBalance} ETH
-                      </p>
-                      <p className="text-xs text-muted-foreground font-mono mt-1">
-                        {walletAddress}
-                      </p>
+                      <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
                     </div>
+                    <p className="text-xs font-bold text-primary mb-1">
+                      {walletBalance} ETH
+                    </p>
+                    <p className="text-xs text-muted-foreground font-mono">
+                      {walletAddress}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      ≈ ₱{ethToPHP(walletBalance)} PHP
+                    </p>
                     <button
-                      onClick={handleDisconnect}
-                      className="w-full text-left px-4 py-2 text-sm text-destructive rounded-lg hover:bg-accent transition-colors mb-2"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        handleDisconnect();
+                      }}
+                      className="w-full text-left px-3 py-2 mt-3 text-sm text-destructive rounded-lg hover:bg-destructive/10 transition-colors border border-destructive/20"
                     >
-                      <div className="flex items-center">
+                      <div className="flex items-center justify-center">
                         <LogOut className="mr-2 h-4 w-4" />
                         Disconnect Wallet
                       </div>
                     </button>
-                  </>
+                  </div>
                 ) : (
                   <Button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       setIsWalletModalOpen(true);
                     }}
-                    className="w-full bg-primary hover:bg-primary/90 mb-2"
+                    className="w-full bg-primary hover:bg-primary/90 mb-3"
                   >
                     <Wallet className="mr-2 h-4 w-4" />
                     Connect Wallet

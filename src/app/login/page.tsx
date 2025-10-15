@@ -57,8 +57,8 @@ export default function LoginPage() {
         "user",
         JSON.stringify({ email: user.email, name: user.name, type: user.type })
       );
-      // Redirect to dashboard (main app)
-      router.push("/dashboard");
+      // Redirect to explore page (main app)
+      router.push("/explore");
     } else {
       setError("Invalid email or password");
       console.log("Login failed:", { email, password });
