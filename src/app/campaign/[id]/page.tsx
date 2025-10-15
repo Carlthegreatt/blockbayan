@@ -30,11 +30,35 @@ import {
   Download,
   Wallet,
   AlertCircle,
+  Star,
+  User,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { generateReceipt, openInExplorer } from "@/lib/receipt-utils";
 import { getWalletData, processDonation, ethToPHP, ethToUSD } from "@/store/walletStore";
+import StarRating from "@/components/ui/star-rating";
+
+// Generate random reputation for campaign creators
+const generateCreatorReputation = (seed: string) => {
+  // Use seed to generate consistent random values for the same creator
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash << 5) - hash + seed.charCodeAt(i);
+    hash = hash & hash;
+  }
+  const random = Math.abs(hash) / 2147483647;
+  
+  return {
+    rating: (3.5 + random * 1.5).toFixed(1), // 3.5 to 5.0
+    totalReviews: Math.floor(random * 150) + 10, // 10 to 160
+    campaignsCreated: Math.floor(random * 20) + 1, // 1 to 21
+    totalRaised: (random * 500 + 50).toFixed(1), // 50 to 550 ETH
+    responseTime: Math.floor(random * 48) + 1, // 1 to 49 hours
+    successRate: (85 + random * 15).toFixed(0), // 85% to 100%
+  };
+};
 
 // Mock campaigns database
 const mockCampaignsData: { [key: string]: any } = {
@@ -55,7 +79,12 @@ const mockCampaignsData: { [key: string]: any } = {
     location: "Mindanao, Philippines",
     image: "https://mindanews.com/wp-content/uploads/2020/07/28haran11.jpg",
     contractAddress: "0x742d35Cc6634C0532925a3b844Bc9e7595C2f4",
-    creator: "0x8e3b...A1d9",
+    creator: {
+      name: "Maria Santos",
+      address: "0x8e3b...A1d9",
+      avatar: "MS",
+      bio: "Community organizer and education advocate with 10+ years of experience.",
+    },
     createdAt: "2025-09-15",
   },
   "2": {
@@ -75,7 +104,12 @@ const mockCampaignsData: { [key: string]: any } = {
     location: "Visayas, Philippines",
     image: "https://files01.pna.gov.ph/category-list/2024/10/01/batac-flooding.jpg",
     contractAddress: "0x9f1a35Dd7845D1643936b4c955Bc8f9a7685B3e7",
-    creator: "0x2c4d...F8a1",
+    creator: {
+      name: "Red Cross PH",
+      address: "0x2c4d...F8a1",
+      avatar: "RC",
+      bio: "Official Philippine Red Cross disaster relief initiatives.",
+    },
     createdAt: "2025-08-20",
   },
   "3": {
@@ -95,7 +129,12 @@ const mockCampaignsData: { [key: string]: any } = {
     location: "Luzon, Philippines",
     image: "https://cdn.prod.website-files.com/6287850a0485ea045a5e0ce2/632899ca01c83a6de49e07b2_WATER%20FOR%20WATERLESS.jpg",
     contractAddress: "0x7b4e28Ff9123E5789abcd4f655Cc91a8D3e2C1a8",
-    creator: "0x5a8c...D9f2",
+    creator: {
+      name: "Juan Dela Cruz",
+      address: "0x5a8c...D9f2",
+      avatar: "JD",
+      bio: "Civil engineer dedicated to improving rural infrastructure.",
+    },
     createdAt: "2025-09-01",
   },
   "4": {
@@ -115,7 +154,12 @@ const mockCampaignsData: { [key: string]: any } = {
     location: "Cordillera, Philippines",
     image: "https://www.scout.org/sites/default/files/styles/social_media/public/d7/news_pictures/3_344.jpg.webp?itok=qBWXYAuF",
     contractAddress: "0x6c8e91Ba2456C7890defg1h234Ee56f7E2d4A8b9",
-    creator: "0x3d2f...A7b9",
+    creator: {
+      name: "Apo Foundation",
+      address: "0x3d2f...A7b9",
+      avatar: "AF",
+      bio: "Non-profit supporting indigenous communities in the Cordillera region.",
+    },
     createdAt: "2025-10-01",
   },
 };
@@ -160,6 +204,12 @@ export default function CampaignDetailsPage() {
   const [campaignData, setCampaignData] = useState(
     mockCampaignsData["1"] || mockCampaignsData["1"]
   );
+
+  // Review modal states
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   useEffect(() => {
     // Load the correct campaign based on ID
@@ -290,6 +340,33 @@ export default function CampaignDetailsPage() {
         text: campaignData.description,
         url: window.location.href,
       });
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (reviewRating === 0) {
+      showToast("Please select a rating", "error");
+      return;
+    }
+    if (!reviewText.trim()) {
+      showToast("Please write a review", "error");
+      return;
+    }
+
+    setIsSubmittingReview(true);
+
+    try {
+      // Simulate review submission
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      showToast("Review submitted successfully!");
+      setShowReviewModal(false);
+      setReviewRating(0);
+      setReviewText("");
+    } catch (error) {
+      showToast("Failed to submit review", "error");
+    } finally {
+      setIsSubmittingReview(false);
     }
   };
 
@@ -662,6 +739,106 @@ export default function CampaignDetailsPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Campaign Creator */}
+            {campaignData.creator && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Campaign Creator</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {(() => {
+                    const creatorRep = generateCreatorReputation(
+                      campaignData.creator.address
+                    );
+                    return (
+                      <>
+                        <div className="flex items-start gap-3">
+                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <span className="text-lg font-semibold text-primary">
+                              {campaignData.creator.avatar}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold">
+                              {campaignData.creator.name}
+                            </h4>
+                            <p className="text-xs text-muted-foreground font-mono">
+                              {campaignData.creator.address}
+                            </p>
+                            <div className="flex items-center gap-1 mt-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-3 w-3 ${
+                                    i < Math.floor(parseFloat(creatorRep.rating))
+                                      ? "fill-amber-400 text-amber-400"
+                                      : "text-muted-foreground"
+                                  }`}
+                                />
+                              ))}
+                              <span className="text-xs text-muted-foreground ml-1">
+                                {creatorRep.rating} ({creatorRep.totalReviews})
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {campaignData.creator.bio && (
+                          <p className="text-sm text-muted-foreground">
+                            {campaignData.creator.bio}
+                          </p>
+                        )}
+
+                        <div className="space-y-2 text-sm">
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">
+                              Campaigns Created
+                            </span>
+                            <span className="font-semibold">
+                              {creatorRep.campaignsCreated}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">
+                              Total Raised
+                            </span>
+                            <span className="font-semibold">
+                              {creatorRep.totalRaised} ETH
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">
+                              Success Rate
+                            </span>
+                            <span className="font-semibold">
+                              {creatorRep.successRate}%
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-muted-foreground">
+                              Response Time
+                            </span>
+                            <span className="font-semibold">
+                              ~{creatorRep.responseTime}h
+                            </span>
+                          </div>
+                        </div>
+
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => setShowReviewModal(true)}
+                        >
+                          <MessageSquare className="mr-2 h-4 w-4" />
+                          Leave a Review
+                        </Button>
+                      </>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </main>
@@ -933,6 +1110,116 @@ export default function CampaignDetailsPage() {
                       </Button>
                     </>
                   )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Review Modal */}
+      <AnimatePresence>
+        {showReviewModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+            onClick={() =>
+              !isSubmittingReview && setShowReviewModal(false)
+            }
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md"
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle>Leave a Review</CardTitle>
+                  <CardDescription>
+                    Share your experience with {campaignData.creator?.name || "this campaign creator"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Creator Info */}
+                  {campaignData.creator && (
+                    <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <span className="text-lg font-semibold text-primary">
+                          {campaignData.creator.avatar}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold">
+                          {campaignData.creator.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground font-mono">
+                          {campaignData.creator.address}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Rating */}
+                  <div className="space-y-2">
+                    <Label>Rating</Label>
+                    <div className="flex items-center gap-2">
+                      <StarRating
+                        rating={reviewRating}
+                        onRatingChange={setReviewRating}
+                        size="lg"
+                        interactive={true}
+                      />
+                      <span className="text-sm text-muted-foreground">
+                        {reviewRating > 0 ? `${reviewRating}.0` : "Select rating"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Review Text */}
+                  <div className="space-y-2">
+                    <Label htmlFor="review">Your Review</Label>
+                    <textarea
+                      id="review"
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      placeholder="Share your thoughts about this campaign and the creator..."
+                      className="w-full min-h-[100px] px-3 py-2 text-sm rounded-md border border-input bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      disabled={isSubmittingReview}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      {reviewText.length}/500 characters
+                    </p>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-2">
+                    <Button
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => setShowReviewModal(false)}
+                      disabled={isSubmittingReview}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      className="flex-1"
+                      onClick={handleSubmitReview}
+                      disabled={isSubmittingReview || reviewRating === 0 || !reviewText.trim()}
+                    >
+                      {isSubmittingReview ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        "Submit Review"
+                      )}
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>

@@ -25,9 +25,30 @@ import {
   Grid,
   List,
   Download,
+  Star,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { ethToPHP } from "@/store/walletStore";
+
+// Generate random reputation for campaign creators
+const generateCreatorReputation = (seed: string) => {
+  // Use seed to generate consistent random values for the same creator
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash << 5) - hash + seed.charCodeAt(i);
+    hash = hash & hash;
+  }
+  const random = Math.abs(hash) / 2147483647;
+  
+  return {
+    rating: (3.5 + random * 1.5).toFixed(1), // 3.5 to 5.0
+    totalReviews: Math.floor(random * 150) + 10, // 10 to 160
+    campaignsCreated: Math.floor(random * 20) + 1, // 1 to 21
+    totalRaised: (random * 500 + 50).toFixed(1), // 50 to 550 ETH
+    responseTime: Math.floor(random * 48) + 1, // 1 to 49 hours
+  };
+};
 
 // Mock campaigns data
 const mockCampaigns = [
@@ -48,6 +69,11 @@ const mockCampaigns = [
     location: "Mindanao, Philippines",
     image:
       "https://mindanews.com/wp-content/uploads/2020/07/28haran11.jpg",
+    creator: {
+      name: "Maria Santos",
+      address: "0x8e3b...A1d9",
+      avatar: "MS",
+    },
   },
   {
     id: "2",
@@ -66,6 +92,11 @@ const mockCampaigns = [
     location: "Visayas, Philippines",
     image:
       "https://files01.pna.gov.ph/category-list/2024/10/01/batac-flooding.jpg",
+    creator: {
+      name: "Red Cross PH",
+      address: "0x2c4d...F8a1",
+      avatar: "RC",
+    },
   },
   {
     id: "3",
@@ -84,6 +115,11 @@ const mockCampaigns = [
     location: "Luzon, Philippines",
     image:
       "https://cdn.prod.website-files.com/6287850a0485ea045a5e0ce2/632899ca01c83a6de49e07b2_WATER%20FOR%20WATERLESS.jpg",
+    creator: {
+      name: "Juan Dela Cruz",
+      address: "0x5a8c...D9f2",
+      avatar: "JD",
+    },
   },
   {
     id: "4",
@@ -102,6 +138,11 @@ const mockCampaigns = [
     location: "Cordillera, Philippines",
     image:
       "https://www.scout.org/sites/default/files/styles/social_media/public/d7/news_pictures/3_344.jpg.webp?itok=qBWXYAuF",
+    creator: {
+      name: "Apo Foundation",
+      address: "0x3d2f...A7b9",
+      avatar: "AF",
+    },
   },
 ];
 
@@ -312,77 +353,104 @@ export default function ExplorePage() {
                     </p>
                   </div>
                 ) : null}
-                {filteredCampaigns.map((campaign) => (
-                  <Card
-                    key={campaign.id}
-                    className="overflow-hidden hover:shadow-lg transition-shadow"
-                  >
-                    <div className="aspect-video relative bg-muted">
-                      <img
-                        src={campaign.image}
-                        alt={campaign.title}
-                        className="object-cover w-full h-full opacity-80"
-                      />
-                      {campaign.verified && (
-                        <Badge className="absolute top-3 right-3 bg-green-500 hover:bg-green-600">
-                          ✓ Verified
-                        </Badge>
-                      )}
-                    </div>
-                    <CardHeader>
-                      <div className="flex items-start justify-between gap-2">
-                        <CardTitle className="text-lg line-clamp-2">
-                          {campaign.title}
-                        </CardTitle>
+                {filteredCampaigns.map((campaign) => {
+                  const creatorRep = campaign.creator
+                    ? generateCreatorReputation(campaign.creator.address)
+                    : null;
+                  return (
+                    <Card
+                      key={campaign.id}
+                      className="overflow-hidden hover:shadow-lg transition-shadow"
+                    >
+                      <div className="aspect-video relative bg-muted">
+                        <img
+                          src={campaign.image}
+                          alt={campaign.title}
+                          className="object-cover w-full h-full opacity-80"
+                        />
+                        {campaign.verified && (
+                          <Badge className="absolute top-3 right-3 bg-green-500 hover:bg-green-600">
+                            ✓ Verified
+                          </Badge>
+                        )}
                       </div>
-                      <CardDescription className="line-clamp-2">
-                        {campaign.description}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Badge variant="outline">{campaign.category}</Badge>
-                        <span>•</span>
-                        <MapPin className="h-3 w-3" />
-                        <span>{campaign.location}</span>
-                      </div>
+                      <CardHeader>
+                        <div className="flex items-start justify-between gap-2">
+                          <CardTitle className="text-lg line-clamp-2">
+                            {campaign.title}
+                          </CardTitle>
+                        </div>
+                        <CardDescription className="line-clamp-2">
+                          {campaign.description}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {/* Creator Info */}
+                        {campaign.creator && creatorRep && (
+                          <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
+                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <span className="text-xs font-semibold text-primary">
+                                {campaign.creator.avatar}
+                              </span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">
+                                {campaign.creator.name}
+                              </p>
+                              <div className="flex items-center gap-1">
+                                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                                <span className="text-xs text-muted-foreground">
+                                  {creatorRep.rating} ({creatorRep.totalReviews})
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
-                      <div>
-                        <div className="flex items-center justify-between text-sm mb-2">
-                          <span className="font-semibold text-primary">
-                            {campaign.raised}
-                          </span>
-                          <span className="text-muted-foreground">
-                            of {campaign.goal}
-                          </span>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Badge variant="outline">{campaign.category}</Badge>
+                          <span>•</span>
+                          <MapPin className="h-3 w-3" />
+                          <span>{campaign.location}</span>
                         </div>
-                        <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
-                          <div
-                            className="bg-primary h-full transition-all duration-300"
-                            style={{ width: `${campaign.percentage}%` }}
-                          />
-                        </div>
-                      </div>
 
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Heart className="h-4 w-4" />
-                          <span>{campaign.donors} donors</span>
+                        <div>
+                          <div className="flex items-center justify-between text-sm mb-2">
+                            <span className="font-semibold text-primary">
+                              {campaign.raised}
+                            </span>
+                            <span className="text-muted-foreground">
+                              of {campaign.goal}
+                            </span>
+                          </div>
+                          <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+                            <div
+                              className="bg-primary h-full transition-all duration-300"
+                              style={{ width: `${campaign.percentage}%` }}
+                            />
+                          </div>
                         </div>
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Calendar className="h-4 w-4" />
-                          <span>
-                            {new Date(campaign.deadline).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
 
-                      <Link href={`/campaign/${campaign.id}`}>
-                        <Button className="w-full">View Campaign</Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                ))}
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Heart className="h-4 w-4" />
+                            <span>{campaign.donors} donors</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Calendar className="h-4 w-4" />
+                            <span>
+                              {new Date(campaign.deadline).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+
+                        <Link href={`/campaign/${campaign.id}`}>
+                          <Button className="w-full">View Campaign</Button>
+                        </Link>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             ) : (
               <div className="space-y-4">
@@ -393,71 +461,97 @@ export default function ExplorePage() {
                     </p>
                   </div>
                 ) : null}
-                {filteredCampaigns.map((campaign) => (
-                  <Card
-                    key={campaign.id}
-                    className="overflow-hidden hover:shadow-lg transition-shadow"
-                  >
-                    <div className="flex flex-col md:flex-row">
-                      <div className="md:w-48 aspect-video relative bg-muted">
-                        <img
-                          src={campaign.image}
-                          alt={campaign.title}
-                          className="object-cover w-full h-full opacity-80"
-                        />
-                      </div>
-                      <div className="flex-1 p-6">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-xl font-bold">
-                                {campaign.title}
-                              </h3>
-                              {campaign.verified && (
-                                <Badge className="bg-green-500 hover:bg-green-600">
-                                  ✓ Verified
-                                </Badge>
+                {filteredCampaigns.map((campaign) => {
+                  const creatorRep = campaign.creator
+                    ? generateCreatorReputation(campaign.creator.address)
+                    : null;
+                  return (
+                    <Card
+                      key={campaign.id}
+                      className="overflow-hidden hover:shadow-lg transition-shadow"
+                    >
+                      <div className="flex flex-col md:flex-row">
+                        <div className="md:w-48 aspect-video relative bg-muted">
+                          <img
+                            src={campaign.image}
+                            alt={campaign.title}
+                            className="object-cover w-full h-full opacity-80"
+                          />
+                        </div>
+                        <div className="flex-1 p-6">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h3 className="text-xl font-bold">
+                                  {campaign.title}
+                                </h3>
+                                {campaign.verified && (
+                                  <Badge className="bg-green-500 hover:bg-green-600">
+                                    ✓ Verified
+                                  </Badge>
+                                )}
+                              </div>
+
+                              {/* Creator Info in List View */}
+                              {campaign.creator && creatorRep && (
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                    <span className="text-xs font-semibold text-primary">
+                                      {campaign.creator.avatar}
+                                    </span>
+                                  </div>
+                                  <span className="text-sm text-muted-foreground">
+                                    by {campaign.creator.name}
+                                  </span>
+                                  <div className="flex items-center gap-1">
+                                    <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                                    <span className="text-xs text-muted-foreground">
+                                      {creatorRep.rating}
+                                    </span>
+                                  </div>
+                                </div>
                               )}
+
+                              <p className="text-sm text-muted-foreground mb-3">
+                                {campaign.description}
+                              </p>
+                              <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
+                                <Badge variant="outline">
+                                  {campaign.category}
+                                </Badge>
+                                <span>•</span>
+                                <MapPin className="h-3 w-3" />
+                                <span>{campaign.location}</span>
+                                <span>•</span>
+                                <Heart className="h-4 w-4" />
+                                <span>{campaign.donors} donors</span>
+                              </div>
                             </div>
-                            <p className="text-sm text-muted-foreground mb-3">
-                              {campaign.description}
-                            </p>
-                            <div className="flex items-center gap-3 text-sm text-muted-foreground mb-4">
-                              <Badge variant="outline">
-                                {campaign.category}
-                              </Badge>
-                              <span>•</span>
-                              <MapPin className="h-3 w-3" />
-                              <span>{campaign.location}</span>
-                              <span>•</span>
-                              <Heart className="h-4 w-4" />
-                              <span>{campaign.donors} donors</span>
+                            <Link href={`/campaign/${campaign.id}`}>
+                              <Button>Donate Now</Button>
+                            </Link>
+                          </div>
+                          <div>
+                            <div className="flex items-center justify-between text-sm mb-2">
+                              <span className="font-semibold text-primary">
+                                {campaign.raised}
+                              </span>
+                              <span className="text-muted-foreground">
+                                of {campaign.goal} • {campaign.percentage}%
+                              </span>
                             </div>
-                          </div>
-                          <Link href={`/campaign/${campaign.id}`}>
-                            <Button>Donate Now</Button>
-                          </Link>
-                        </div>
-                        <div>
-                          <div className="flex items-center justify-between text-sm mb-2">
-                            <span className="font-semibold text-primary">
-                              {campaign.raised}
-                            </span>
-                            <span className="text-muted-foreground">
-                              of {campaign.goal} • {campaign.percentage}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
-                            <div
-                              className="bg-primary h-full transition-all duration-300"
-                              style={{ width: `${campaign.percentage}%` }}
-                            />
+                            <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+                              <div
+                                className="bg-primary h-full transition-all duration-300"
+                                style={{ width: `${campaign.percentage}%` }}
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </Card>
-                ))}
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </TabsContent>
