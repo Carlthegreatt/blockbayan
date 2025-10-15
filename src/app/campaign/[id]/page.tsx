@@ -34,6 +34,7 @@ import {
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { generateReceipt, openInExplorer } from "@/lib/receipt-utils";
+import { getWalletData, processDonation, ethToPHP, ethToUSD } from "@/store/walletStore";
 
 // Mock campaigns database
 const mockCampaignsData: { [key: string]: any } = {
@@ -228,33 +229,53 @@ export default function CampaignDetailsPage() {
       return;
     }
 
-    // Check if user has enough balance
-    const totalCost = parseFloat(donationAmount) + 0.002; // Include gas fee
-    if (totalCost > parseFloat(walletBalance)) {
-      showToast("Insufficient balance for this transaction", "error");
+    const amount = parseFloat(donationAmount);
+    if (!amount || amount <= 0) {
+      showToast("Invalid donation amount", "error");
       return;
     }
 
     setIsDonating(true);
-    // Simulate blockchain transaction
-    await new Promise((resolve) => setTimeout(resolve, 2500));
 
-    // Generate random transaction hash
-    const randomHex = () =>
-      Math.floor(Math.random() * 0xffffffff)
-        .toString(16)
-        .padStart(8, "0");
-    const txHash = `0x${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}`;
+    try {
+      // Process donation using wallet store (includes balance check and transaction creation)
+      const tx = await processDonation(
+        amount,
+        campaignData.id,
+        campaignData.title,
+        campaignData.contractAddress
+      );
 
-    setDonationTxHash(txHash);
+      setDonationTxHash(tx.txHash);
 
-    // Update wallet balance
-    const newBalance = (parseFloat(walletBalance) - totalCost).toFixed(4);
-    setWalletBalance(newBalance);
-    sessionStorage.setItem("walletBalance", newBalance);
+      // Update local wallet balance
+      const wallet = getWalletData();
+      if (wallet) {
+        setWalletBalance(wallet.balance);
+      }
 
-    setIsDonating(false);
-    setDonationSuccess(true);
+      // Reload campaign data to show updated raised amount
+      const storedCampaigns = sessionStorage.getItem("userCampaigns");
+      if (storedCampaigns && params.id) {
+        const campaigns = JSON.parse(storedCampaigns);
+        const foundCampaign = campaigns.find((c: any) => c.id === params.id);
+        if (foundCampaign) {
+          setCampaignData({
+            ...campaignData,
+            raised: foundCampaign.raised,
+            percentage: foundCampaign.percentage,
+            donors: foundCampaign.donors,
+          });
+        }
+      }
+
+      setIsDonating(false);
+      setDonationSuccess(true);
+      showToast("Donation successful!", "success");
+    } catch (error: any) {
+      setIsDonating(false);
+      showToast(error.message || "Failed to process donation", "error");
+    }
   };
 
   const copyToClipboard = (text: string) => {
@@ -773,9 +794,7 @@ export default function CampaignDetailsPage() {
                         <div className="flex justify-between text-xs">
                           <span className="text-muted-foreground">
                             {donationAmount &&
-                              `≈ ₱${(
-                                parseFloat(donationAmount) * 135000
-                              ).toLocaleString()} PHP`}
+                              `≈ $${ethToUSD(donationAmount)} USD / ₱${ethToPHP(donationAmount)} PHP`}
                           </span>
                           <span className="text-muted-foreground">
                             Balance: {walletBalance} ETH

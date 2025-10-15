@@ -27,6 +27,7 @@ import {
   Wallet,
 } from "lucide-react";
 import Link from "next/link";
+import { ethToPHP } from "@/store/walletStore";
 
 type CampaignStep =
   | "basic-info"
@@ -477,11 +478,7 @@ export default function CreateCampaignPage() {
                       />
                       {formData.goal && (
                         <p className="text-xs text-muted-foreground">
-                          ≈ ₱
-                          {(
-                            parseFloat(formData.goal) * 135000
-                          ).toLocaleString()}{" "}
-                          PHP
+                          ≈ ₱{ethToPHP(formData.goal)} PHP
                         </p>
                       )}
                     </div>

@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, Check, AlertCircle } from "lucide-react";
 import { useToast } from "@/components/ui/toast";
+import { processWithdrawal } from "@/store/walletStore";
 
 interface WithdrawFundsModalProps {
   isOpen: boolean;
@@ -41,25 +42,36 @@ export default function WithdrawFundsModal({
 
   const handleWithdraw = async () => {
     const withdrawAmount = parseFloat(amount);
+    if (!withdrawAmount || withdrawAmount <= 0) {
+      showToast("Invalid amount", "error");
+      return;
+    }
+    
     if (withdrawAmount > availableAmount) {
       showToast("Insufficient funds", "error");
       return;
     }
 
     setIsWithdrawing(true);
-    // Simulate blockchain transaction
-    await new Promise((resolve) => setTimeout(resolve, 2500));
 
-    const randomHex = () =>
-      Math.floor(Math.random() * 0xffffffff)
-        .toString(16)
-        .padStart(8, "0");
-    const generatedTxHash = `0x${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}${randomHex()}`;
+    try {
+      // Process withdrawal using wallet store
+      // Note: For a real campaign address, we'd need to pass it. Using placeholder for now.
+      const tx = await processWithdrawal(
+        withdrawAmount,
+        campaign.id,
+        campaign.title,
+        "0x0000000000000000000000000000000000000000" // Placeholder campaign address
+      );
 
-    setTxHash(generatedTxHash);
-    setIsWithdrawing(false);
-    setWithdrawSuccess(true);
-    showToast("Withdrawal successful!", "success");
+      setTxHash(tx.txHash);
+      setIsWithdrawing(false);
+      setWithdrawSuccess(true);
+      showToast("Withdrawal successful!", "success");
+    } catch (error: any) {
+      setIsWithdrawing(false);
+      showToast(error.message || "Withdrawal failed", "error");
+    }
   };
 
   const handleClose = () => {

@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { getWalletData, saveWalletData, ethToPHP } from "@/store/walletStore";
 
 // Wallet options data
 interface WalletOption {
@@ -191,17 +192,12 @@ export default function DashboardPage() {
       }
     }
 
-    // Load wallet connection data from localStorage
-    const walletData = localStorage.getItem("wallet");
-    if (walletData) {
-      try {
-        const { connected, address, type } = JSON.parse(walletData);
-        setWalletConnected(connected);
-        setConnectedAddress(address);
-        setConnectedWallet(type);
-      } catch (error) {
-        console.error("Error loading wallet data:", error);
-      }
+    // Load wallet connection data using wallet store
+    const wallet = getWalletData();
+    if (wallet && wallet.connected) {
+      setWalletConnected(wallet.connected);
+      setConnectedAddress(wallet.address);
+      setConnectedWallet(wallet.type);
     }
   }, []);
 
@@ -241,15 +237,20 @@ export default function DashboardPage() {
       setIsWalletModalOpen(false);
       setConnecting(null);
 
-      // Save wallet connection to localStorage
-      localStorage.setItem(
-        "wallet",
-        JSON.stringify({
-          connected: true,
-          address: truncatedAddress,
-          type: walletId,
-        })
-      );
+      // Generate initial balance if not exists
+      let balance = sessionStorage.getItem("walletBalance");
+      if (!balance) {
+        balance = (Math.random() * 10 + 5).toFixed(4);
+      }
+
+      // Save wallet connection using wallet store
+      saveWalletData({
+        connected: true,
+        address: truncatedAddress,
+        type: walletId,
+        balance: balance,
+        network: 'Ethereum',
+      });
     } catch (err) {
       setError("Failed to connect wallet. Please try again.");
       setConnecting(null);
@@ -260,7 +261,13 @@ export default function DashboardPage() {
     setWalletConnected(false);
     setConnectedWallet("");
     setConnectedAddress("");
-    localStorage.removeItem("wallet");
+    
+    // Import disconnectWallet from wallet store
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem("wallet");
+      sessionStorage.removeItem("wallet");
+      sessionStorage.removeItem("walletBalance");
+    }
   };
 
   return (
@@ -423,7 +430,7 @@ export default function DashboardPage() {
                 <CardContent>
                   <div className="text-2xl font-bold">17.5 ETH</div>
                   <p className="text-xs text-muted-foreground">
-                    ≈ ₱2,362,500 PHP
+                    ≈ ₱{ethToPHP(17.5)} PHP
                   </p>
                 </CardContent>
               </Card>

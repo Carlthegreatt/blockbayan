@@ -27,6 +27,7 @@ import {
   Download,
 } from "lucide-react";
 import Link from "next/link";
+import { ethToPHP } from "@/store/walletStore";
 
 // Mock campaigns data
 const mockCampaigns = [
@@ -114,7 +115,7 @@ const mockTransactions = [
     from: "0x742d...C2f4",
     to: "0x8e3b...A1d9",
     amount: "5 ETH",
-    amountUSD: "₱675,000",
+    amountPHP: "₱675,000",
     txHash: "0xabc123...def456",
     campaign: "Support Local Schools",
     chain: "Ethereum",
@@ -127,7 +128,7 @@ const mockTransactions = [
     from: "0x9f1a...B3e7",
     to: "0x2c4d...F8a1",
     amount: "10 ETH",
-    amountUSD: "₱1,350,000",
+    amountPHP: "₱1,350,000",
     txHash: "0x789ghi...jkl012",
     campaign: "Medical Aid Fund",
     chain: "Polygon",
@@ -140,7 +141,7 @@ const mockTransactions = [
     from: "0x8e3b...A1d9",
     to: "0x742d...C2f4",
     amount: "20 ETH",
-    amountUSD: "₱2,700,000",
+    amountPHP: "₱2,700,000",
     txHash: "0x345mno...pqr678",
     campaign: "Medical Aid Fund",
     chain: "Ethereum",
@@ -153,7 +154,7 @@ const mockTransactions = [
     from: "0x5a8c...D9f2",
     to: "0x7b4e...C1a8",
     amount: "2.5 ETH",
-    amountUSD: "₱337,500",
+    amountPHP: "₱337,500",
     txHash: "0x901stu...vwx234",
     campaign: "Community Water Project",
     chain: "Ethereum",
@@ -166,7 +167,7 @@ const mockTransactions = [
     from: "0x3d2f...A7b9",
     to: "0x6c8e...E2d4",
     amount: "7.5 ETH",
-    amountUSD: "₱1,012,500",
+    amountPHP: "₱1,012,500",
     txHash: "0x567yza...bcd890",
     campaign: "Indigenous Youth Fund",
     chain: "Base",
@@ -604,7 +605,7 @@ export default function ExplorePage() {
                             <div className="space-y-1">
                               <p className="font-semibold">{tx.amount}</p>
                               <p className="text-xs text-muted-foreground">
-                                {tx.amountUSD}
+                                {tx.amountPHP}
                               </p>
                             </div>
                           </td>
