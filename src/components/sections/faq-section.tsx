@@ -38,11 +38,6 @@ export function FAQSection() {
         "Absolutely. BlockBayan uses blockchain technology to create immutable audit trails that prevent fraud. Every transaction is publicly verifiable, with smart contracts automating fund distribution based on predefined conditions. This addresses the PHP 1 trillion corruption problem through continuous real-time monitoring.",
     },
     {
-      question: "How does the community voting system work?",
-      answer:
-        "Local barangay councils, volunteers, and affected residents join our blockchain-powered voting system to propose and vote on aid allocation priorities. This ensures decisions are made by those on the ground who understand actual needs, preventing centralized mismanagement and embodying true bayanihan spirit.",
-    },
-    {
       question: "Can overseas Filipinos donate easily?",
       answer:
         "Yes! Overseas Filipino workers can send USDC stablecoins that convert to PHP within minutes, eliminating 5-15% transfer fees and delays. BlockBayan enables instant cross-border transfers, allowing your loved ones back home to receive help immediately during disasters.",

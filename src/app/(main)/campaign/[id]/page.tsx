@@ -631,15 +631,15 @@ export default function CampaignDetailsPage() {
                           </p>
                           <code
                             className="text-sm font-mono cursor-help block"
-                            title={campaignData.creator}
+                            title={campaignData.creator?.address || "N/A"}
                           >
-                            {campaignData.creator}
+                            {campaignData.creator?.address || "N/A"}
                           </code>
                         </div>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => copyToClipboard(campaignData.creator)}
+                          onClick={() => copyToClipboard(campaignData.creator?.address || "")}
                           className="flex-shrink-0"
                         >
                           <Copy className="h-4 w-4" />
@@ -780,36 +780,38 @@ export default function CampaignDetailsPage() {
                     );
                     return (
                       <>
-                        <div className="flex items-start gap-3">
-                          <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            <span className="text-lg font-semibold text-primary">
-                              {campaignData.creator.avatar}
-                            </span>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-semibold">
-                              {campaignData.creator.name}
-                            </h4>
-                            <p className="text-xs text-muted-foreground font-mono">
-                              {campaignData.creator.address}
-                            </p>
-                            <div className="flex items-center gap-1 mt-1">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-3 w-3 ${
-                                    i < Math.floor(parseFloat(creatorRep.rating))
-                                      ? "fill-amber-400 text-amber-400"
-                                      : "text-muted-foreground"
-                                  }`}
-                                />
-                              ))}
-                              <span className="text-xs text-muted-foreground ml-1">
-                                {creatorRep.rating} ({creatorRep.totalReviews})
+                        <Link href={`/dashboard/${campaignData.creator.address}`}>
+                          <div className="flex items-start gap-3 hover:bg-muted/50 p-2 rounded-lg transition-colors cursor-pointer -mx-2">
+                            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                              <span className="text-lg font-semibold text-primary">
+                                {campaignData.creator.avatar}
                               </span>
                             </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold hover:text-primary transition-colors">
+                                {campaignData.creator.name}
+                              </h4>
+                              <p className="text-xs text-muted-foreground font-mono">
+                                {campaignData.creator.address}
+                              </p>
+                              <div className="flex items-center gap-1 mt-1">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`h-3 w-3 ${
+                                      i < Math.floor(parseFloat(creatorRep.rating))
+                                        ? "fill-amber-400 text-amber-400"
+                                        : "text-muted-foreground"
+                                    }`}
+                                  />
+                                ))}
+                                <span className="text-xs text-muted-foreground ml-1">
+                                  {creatorRep.rating} ({creatorRep.totalReviews})
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                        </div>
+                        </Link>
 
                         {campaignData.creator.bio && (
                           <p className="text-sm text-muted-foreground">

@@ -28,6 +28,9 @@ import {
   Wallet,
   CheckCircle2,
   Loader2,
+  Search,
+  User,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,6 +43,60 @@ import {
   initializeDefaultCampaigns,
 } from "@/store/walletStore";
 import { WALLET_OPTIONS } from "@/config/wallets";
+import { Input } from "@/components/ui/input";
+
+// Generate random reputation for campaign creators
+const generateCreatorReputation = (seed: string) => {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash << 5) - hash + seed.charCodeAt(i);
+    hash = hash & hash;
+  }
+  const random = Math.abs(hash) / 2147483647;
+  
+  return {
+    rating: (3.5 + random * 1.5).toFixed(1),
+    totalReviews: Math.floor(random * 150) + 10,
+    campaignsCreated: Math.floor(random * 20) + 1,
+    totalRaised: (random * 500 + 50).toFixed(1),
+  };
+};
+
+// User profiles database for search
+const userProfiles = [
+  {
+    id: "0x8e3b...A1d9",
+    name: "Maria Santos",
+    avatar: "MS",
+    address: "0x8e3b...A1d9",
+    bio: "Community organizer and education advocate with 10+ years of experience.",
+    location: "Mindanao, Philippines",
+  },
+  {
+    id: "0x2c4d...F8a1",
+    name: "Red Cross PH",
+    avatar: "RC",
+    address: "0x2c4d...F8a1",
+    bio: "Official Philippine Red Cross disaster relief initiatives.",
+    location: "Philippines",
+  },
+  {
+    id: "0x5a8c...D9f2",
+    name: "Juan Dela Cruz",
+    avatar: "JD",
+    address: "0x5a8c...D9f2",
+    bio: "Civil engineer dedicated to improving rural infrastructure.",
+    location: "Luzon, Philippines",
+  },
+  {
+    id: "0x3d2f...A7b9",
+    name: "Apo Foundation",
+    avatar: "AF",
+    address: "0x3d2f...A7b9",
+    bio: "Non-profit supporting indigenous communities in the Cordillera region.",
+    location: "Cordillera, Philippines",
+  },
+];
 
 // Mock data
 const mockCampaigns = [
@@ -135,6 +192,11 @@ export default function DashboardPage() {
   const [connectedAddress, setConnectedAddress] = useState<string>("");
   const [connecting, setConnecting] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
+
+  // User search state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<typeof userProfiles>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
 
   useEffect(() => {
     // Initialize default campaigns and load user campaigns
@@ -233,6 +295,33 @@ export default function DashboardPage() {
       sessionStorage.removeItem("wallet");
       sessionStorage.removeItem("walletBalance");
     }
+  };
+
+  // Handle user search
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query.trim().length > 0) {
+      const filtered = userProfiles.filter(
+        (user) =>
+          user.name.toLowerCase().includes(query.toLowerCase()) ||
+          user.address.toLowerCase().includes(query.toLowerCase()) ||
+          user.bio.toLowerCase().includes(query.toLowerCase()) ||
+          user.location.toLowerCase().includes(query.toLowerCase())
+      );
+      setSearchResults(filtered);
+      setShowSearchResults(true);
+    } else {
+      setSearchResults([]);
+      setShowSearchResults(false);
+    }
+  };
+
+  const handleUserSelect = (userId: string) => {
+    setSearchQuery("");
+    setShowSearchResults(false);
+    router.push(`/dashboard/${userId}`);
   };
 
   return (
@@ -370,11 +459,94 @@ export default function DashboardPage() {
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back! Here's your blockchain giving overview.
-          </p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold text-foreground mb-2">Dashboard</h1>
+              <p className="text-muted-foreground">
+                Welcome back! Here's your blockchain giving overview.
+              </p>
+            </div>
+            
+            {/* User Search */}
+            <div className="relative w-full md:w-96">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search for creators..."
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onFocus={() => searchQuery && setShowSearchResults(true)}
+                  className="pl-10 pr-4"
+                />
+              </div>
+
+              {/* Search Results Dropdown */}
+              <AnimatePresence>
+                {showSearchResults && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full mt-2 w-full bg-background border border-border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto"
+                  >
+                    {searchResults.length > 0 ? (
+                      <div className="p-2">
+                        {searchResults.map((user) => {
+                          const reputation = generateCreatorReputation(user.address);
+                          return (
+                            <button
+                              key={user.id}
+                              onClick={() => handleUserSelect(user.id)}
+                              className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-muted transition-colors text-left"
+                            >
+                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <span className="text-sm font-semibold text-primary">
+                                  {user.avatar}
+                                </span>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <p className="font-semibold truncate">{user.name}</p>
+                                  <div className="flex items-center gap-1">
+                                    <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                                    <span className="text-xs text-muted-foreground">
+                                      {reputation.rating}
+                                    </span>
+                                  </div>
+                                </div>
+                                <p className="text-xs text-muted-foreground font-mono mb-1">
+                                  {user.address}
+                                </p>
+                                <p className="text-xs text-muted-foreground line-clamp-1">
+                                  {user.location}
+                                </p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="p-8 text-center">
+                        <User className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                        <p className="text-sm text-muted-foreground">
+                          No creators found matching "{searchQuery}"
+                        </p>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
+
+        {/* Overlay to close search results when clicking outside */}
+        {showSearchResults && (
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setShowSearchResults(false)}
+          />
+        )}
 
         <Tabs
           value={activeTab}

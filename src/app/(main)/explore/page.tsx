@@ -387,24 +387,26 @@ export default function ExplorePage() {
                       <CardContent className="space-y-4">
                         {/* Creator Info */}
                         {campaign.creator && creatorRep && (
-                          <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg">
-                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                              <span className="text-xs font-semibold text-primary">
-                                {campaign.creator.avatar}
-                              </span>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium truncate">
-                                {campaign.creator.name}
-                              </p>
-                              <div className="flex items-center gap-1">
-                                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                                <span className="text-xs text-muted-foreground">
-                                  {creatorRep.rating} ({creatorRep.totalReviews})
+                          <Link href={`/dashboard/${campaign.creator.address}`}>
+                            <div className="flex items-center gap-2 p-2 bg-muted/50 rounded-lg hover:bg-muted transition-colors cursor-pointer">
+                              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <span className="text-xs font-semibold text-primary">
+                                  {campaign.creator.avatar}
                                 </span>
                               </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate hover:text-primary transition-colors">
+                                  {campaign.creator.name}
+                                </p>
+                                <div className="flex items-center gap-1">
+                                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                                  <span className="text-xs text-muted-foreground">
+                                    {creatorRep.rating} ({creatorRep.totalReviews})
+                                  </span>
+                                </div>
+                              </div>
                             </div>
-                          </div>
+                          </Link>
                         )}
 
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -494,22 +496,24 @@ export default function ExplorePage() {
 
                               {/* Creator Info in List View */}
                               {campaign.creator && creatorRep && (
-                                <div className="flex items-center gap-2 mb-3">
-                                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                                    <span className="text-xs font-semibold text-primary">
-                                      {campaign.creator.avatar}
+                                <Link href={`/dashboard/${campaign.creator.address}`}>
+                                  <div className="flex items-center gap-2 mb-3 hover:bg-muted/50 p-1 rounded transition-colors cursor-pointer w-fit">
+                                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                      <span className="text-xs font-semibold text-primary">
+                                        {campaign.creator.avatar}
+                                      </span>
+                                    </div>
+                                    <span className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                                      by {campaign.creator.name}
                                     </span>
+                                    <div className="flex items-center gap-1">
+                                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                                      <span className="text-xs text-muted-foreground">
+                                        {creatorRep.rating}
+                                      </span>
+                                    </div>
                                   </div>
-                                  <span className="text-sm text-muted-foreground">
-                                    by {campaign.creator.name}
-                                  </span>
-                                  <div className="flex items-center gap-1">
-                                    <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                                    <span className="text-xs text-muted-foreground">
-                                      {creatorRep.rating}
-                                    </span>
-                                  </div>
-                                </div>
+                                </Link>
                               )}
 
                               <p className="text-sm text-muted-foreground mb-3">

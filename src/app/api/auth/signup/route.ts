@@ -23,14 +23,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate password strength
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: "Password must be at least 8 characters long" },
-        { status: 400 }
-      );
-    }
-
     // Validate user type
     const validUserTypes = ["donor", "beneficiary", "organization"];
     if (!validUserTypes.includes(userType)) {
