@@ -19,7 +19,7 @@ export interface WalletData {
 
 export interface Transaction {
   id: string;
-  type: 'donation' | 'withdrawal' | 'campaign_creation';
+  type: "donation" | "withdrawal" | "campaign_creation";
   amount: string;
   amountETH: number;
   amountUSD: string;
@@ -29,7 +29,7 @@ export interface Transaction {
   campaign?: string;
   txHash: string;
   timestamp: string;
-  status: 'success' | 'pending' | 'failed';
+  status: "success" | "pending" | "failed";
   gasFee: number;
 }
 
@@ -37,8 +37,9 @@ export interface Transaction {
  * Convert ETH to PHP
  */
 export function ethToPHP(ethAmount: number | string): string {
-  const amount = typeof ethAmount === 'string' ? parseFloat(ethAmount) : ethAmount;
-  return (amount * ETH_PRICE.PHP).toLocaleString('en-PH', {
+  const amount =
+    typeof ethAmount === "string" ? parseFloat(ethAmount) : ethAmount;
+  return (amount * ETH_PRICE.PHP).toLocaleString("en-PH", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
@@ -48,8 +49,9 @@ export function ethToPHP(ethAmount: number | string): string {
  * Convert ETH to USD
  */
 export function ethToUSD(ethAmount: number | string): string {
-  const amount = typeof ethAmount === 'string' ? parseFloat(ethAmount) : ethAmount;
-  return (amount * ETH_PRICE.USD).toLocaleString('en-US', {
+  const amount =
+    typeof ethAmount === "string" ? parseFloat(ethAmount) : ethAmount;
+  return (amount * ETH_PRICE.USD).toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
@@ -59,7 +61,8 @@ export function ethToUSD(ethAmount: number | string): string {
  * Format ETH amount with proper decimals
  */
 export function formatETH(ethAmount: number | string): string {
-  const amount = typeof ethAmount === 'string' ? parseFloat(ethAmount) : ethAmount;
+  const amount =
+    typeof ethAmount === "string" ? parseFloat(ethAmount) : ethAmount;
   return amount.toFixed(4);
 }
 
@@ -67,27 +70,27 @@ export function formatETH(ethAmount: number | string): string {
  * Get wallet data from storage
  */
 export function getWalletData(): WalletData | null {
-  if (typeof window === 'undefined') return null;
-  
-  const walletDataLS = localStorage.getItem('wallet');
-  const walletDataSS = sessionStorage.getItem('wallet');
+  if (typeof window === "undefined") return null;
+
+  const walletDataLS = localStorage.getItem("wallet");
+  const walletDataSS = sessionStorage.getItem("wallet");
   const walletData = walletDataLS || walletDataSS;
-  
+
   if (!walletData) return null;
-  
+
   try {
     const parsed = JSON.parse(walletData);
-    const balance = sessionStorage.getItem('walletBalance') || '0.00';
-    
+    const balance = sessionStorage.getItem("walletBalance") || "0.00";
+
     return {
       connected: parsed.connected || false,
-      address: parsed.address || '',
-      type: parsed.type || '',
+      address: parsed.address || "",
+      type: parsed.type || "",
       balance: balance,
-      network: parsed.network || 'Ethereum',
+      network: parsed.network || "Ethereum",
     };
   } catch (error) {
-    console.error('Error parsing wallet data:', error);
+    console.error("Error parsing wallet data:", error);
     return null;
   }
 }
@@ -96,23 +99,23 @@ export function getWalletData(): WalletData | null {
  * Save wallet data to storage
  */
 export function saveWalletData(wallet: Partial<WalletData>): void {
-  if (typeof window === 'undefined') return;
-  
+  if (typeof window === "undefined") return;
+
   const current = getWalletData();
   const updated = { ...current, ...wallet };
-  
+
   const storageData = {
     connected: updated.connected,
     address: updated.address,
     type: updated.type,
-    network: updated.network || 'Ethereum',
+    network: updated.network || "Ethereum",
   };
-  
-  localStorage.setItem('wallet', JSON.stringify(storageData));
-  sessionStorage.setItem('wallet', JSON.stringify(storageData));
-  
+
+  localStorage.setItem("wallet", JSON.stringify(storageData));
+  sessionStorage.setItem("wallet", JSON.stringify(storageData));
+
   if (updated.balance) {
-    sessionStorage.setItem('walletBalance', updated.balance);
+    sessionStorage.setItem("walletBalance", updated.balance);
   }
 }
 
@@ -120,23 +123,23 @@ export function saveWalletData(wallet: Partial<WalletData>): void {
  * Update wallet balance
  */
 export function updateWalletBalance(newBalance: string): void {
-  if (typeof window === 'undefined') return;
-  sessionStorage.setItem('walletBalance', newBalance);
+  if (typeof window === "undefined") return;
+  sessionStorage.setItem("walletBalance", newBalance);
 }
 
 /**
  * Get all transactions
  */
 export function getTransactions(): Transaction[] {
-  if (typeof window === 'undefined') return [];
-  
-  const txData = sessionStorage.getItem('transactions');
+  if (typeof window === "undefined") return [];
+
+  const txData = sessionStorage.getItem("transactions");
   if (!txData) return [];
-  
+
   try {
     return JSON.parse(txData);
   } catch (error) {
-    console.error('Error parsing transactions:', error);
+    console.error("Error parsing transactions:", error);
     return [];
   }
 }
@@ -144,38 +147,40 @@ export function getTransactions(): Transaction[] {
 /**
  * Add a new transaction
  */
-export function addTransaction(tx: Omit<Transaction, 'id' | 'timestamp' | 'amountUSD' | 'amountPHP'>): Transaction {
-  if (typeof window === 'undefined') {
-    throw new Error('Cannot add transaction on server side');
+export function addTransaction(
+  tx: Omit<Transaction, "id" | "timestamp" | "amountUSD" | "amountPHP">
+): Transaction {
+  if (typeof window === "undefined") {
+    throw new Error("Cannot add transaction on server side");
   }
-  
+
   const transactions = getTransactions();
-  
+
   const newTx: Transaction = {
     ...tx,
     id: `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    timestamp: new Date().toLocaleString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
+    timestamp: new Date().toLocaleString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
       hour12: false,
     }),
     amountUSD: `$${ethToUSD(tx.amountETH)}`,
     amountPHP: `₱${ethToPHP(tx.amountETH)}`,
   };
-  
+
   transactions.unshift(newTx);
-  
+
   // Keep only last 100 transactions
   if (transactions.length > 100) {
     transactions.splice(100);
   }
-  
-  sessionStorage.setItem('transactions', JSON.stringify(transactions));
-  
+
+  sessionStorage.setItem("transactions", JSON.stringify(transactions));
+
   return newTx;
 }
 
@@ -183,8 +188,8 @@ export function addTransaction(tx: Omit<Transaction, 'id' | 'timestamp' | 'amoun
  * Generate random wallet address
  */
 export function generateWalletAddress(): string {
-  const chars = '0123456789abcdef';
-  let address = '0x';
+  const chars = "0123456789abcdef";
+  let address = "0x";
   for (let i = 0; i < 40; i++) {
     address += chars[Math.floor(Math.random() * chars.length)];
   }
@@ -195,7 +200,7 @@ export function generateWalletAddress(): string {
  * Truncate wallet address for display
  */
 export function truncateAddress(address: string): string {
-  if (!address) return '';
+  if (!address) return "";
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
@@ -203,8 +208,8 @@ export function truncateAddress(address: string): string {
  * Generate transaction hash
  */
 export function generateTxHash(): string {
-  const chars = '0123456789abcdef';
-  let hash = '0x';
+  const chars = "0123456789abcdef";
+  let hash = "0x";
   for (let i = 0; i < 64; i++) {
     hash += chars[Math.floor(Math.random() * chars.length)];
   }
@@ -214,23 +219,25 @@ export function generateTxHash(): string {
 /**
  * Simulate wallet connection
  */
-export async function simulateWalletConnection(walletType: string): Promise<WalletData> {
+export async function simulateWalletConnection(
+  walletType: string
+): Promise<WalletData> {
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 1500));
-  
+
   const address = generateWalletAddress();
   const balance = (Math.random() * 10 + 5).toFixed(4); // Random balance between 5-15 ETH
-  
+
   const wallet: WalletData = {
     connected: true,
-    address: truncateAddress(address),
+    address: address, // Store full address, not truncated
     type: walletType,
     balance: balance,
-    network: 'Ethereum',
+    network: "Ethereum",
   };
-  
+
   saveWalletData(wallet);
-  
+
   return wallet;
 }
 
@@ -238,23 +245,25 @@ export async function simulateWalletConnection(walletType: string): Promise<Wall
  * Disconnect wallet
  */
 export function disconnectWallet(): void {
-  if (typeof window === 'undefined') return;
-  
-  localStorage.removeItem('wallet');
-  sessionStorage.removeItem('wallet');
-  sessionStorage.removeItem('walletBalance');
+  if (typeof window === "undefined") return;
+
+  localStorage.removeItem("wallet");
+  sessionStorage.removeItem("wallet");
+  sessionStorage.removeItem("walletBalance");
 }
 
 /**
  * Calculate gas fee (simulated)
  */
-export function calculateGasFee(transactionType: 'donation' | 'withdrawal' | 'campaign_creation'): number {
+export function calculateGasFee(
+  transactionType: "donation" | "withdrawal" | "campaign_creation"
+): number {
   switch (transactionType) {
-    case 'donation':
+    case "donation":
       return 0.002;
-    case 'withdrawal':
+    case "withdrawal":
       return 0.003;
-    case 'campaign_creation':
+    case "campaign_creation":
       return 0.005;
     default:
       return 0.002;
@@ -272,39 +281,39 @@ export async function processDonation(
 ): Promise<Transaction> {
   const wallet = getWalletData();
   if (!wallet || !wallet.connected) {
-    throw new Error('Wallet not connected');
+    throw new Error("Wallet not connected");
   }
-  
-  const gasFee = calculateGasFee('donation');
+
+  const gasFee = calculateGasFee("donation");
   const totalCost = amount + gasFee;
-  
+
   if (totalCost > parseFloat(wallet.balance)) {
-    throw new Error('Insufficient balance');
+    throw new Error("Insufficient balance");
   }
-  
+
   // Simulate blockchain delay
   await new Promise((resolve) => setTimeout(resolve, 2500));
-  
+
   // Update balance
   const newBalance = (parseFloat(wallet.balance) - totalCost).toFixed(4);
   updateWalletBalance(newBalance);
-  
+
   // Create transaction
   const tx = addTransaction({
-    type: 'donation',
+    type: "donation",
     amount: `${amount} ETH`,
     amountETH: amount,
     from: wallet.address,
     to: campaignAddress,
     campaign: campaignTitle,
     txHash: generateTxHash(),
-    status: 'success',
+    status: "success",
     gasFee: gasFee,
   });
-  
+
   // Update campaign raised amount
   updateCampaignRaised(campaignId, amount);
-  
+
   return tx;
 }
 
@@ -319,62 +328,66 @@ export async function processWithdrawal(
 ): Promise<Transaction> {
   const wallet = getWalletData();
   if (!wallet || !wallet.connected) {
-    throw new Error('Wallet not connected');
+    throw new Error("Wallet not connected");
   }
-  
+
   // Simulate blockchain delay
   await new Promise((resolve) => setTimeout(resolve, 2500));
-  
+
   // Update balance
   const newBalance = (parseFloat(wallet.balance) + amount).toFixed(4);
   updateWalletBalance(newBalance);
-  
+
   // Create transaction
   const tx = addTransaction({
-    type: 'withdrawal',
+    type: "withdrawal",
     amount: `${amount} ETH`,
     amountETH: amount,
     from: campaignAddress,
     to: wallet.address,
     campaign: campaignTitle,
     txHash: generateTxHash(),
-    status: 'success',
-    gasFee: calculateGasFee('withdrawal'),
+    status: "success",
+    gasFee: calculateGasFee("withdrawal"),
   });
-  
+
   return tx;
 }
 
 /**
  * Update campaign raised amount
  */
-function updateCampaignRaised(campaignId: string, additionalAmount: number): void {
-  if (typeof window === 'undefined') return;
-  
-  const campaignsData = sessionStorage.getItem('userCampaigns');
+function updateCampaignRaised(
+  campaignId: string,
+  additionalAmount: number
+): void {
+  if (typeof window === "undefined") return;
+
+  const campaignsData = sessionStorage.getItem("userCampaigns");
   if (!campaignsData) return;
-  
+
   try {
     const campaigns = JSON.parse(campaignsData);
     const campaignIndex = campaigns.findIndex((c: any) => c.id === campaignId);
-    
+
     if (campaignIndex !== -1) {
       const campaign = campaigns[campaignIndex];
-      const currentRaised = parseFloat(campaign.raised.replace(' ETH', '')) || 0;
+      const currentRaised =
+        parseFloat(campaign.raised.replace(" ETH", "")) || 0;
       const newRaised = currentRaised + additionalAmount;
-      const goal = parseFloat(campaign.goal.replace(' ETH', '')) || 100;
-      
+      const goal = parseFloat(campaign.goal.replace(" ETH", "")) || 100;
+
       campaigns[campaignIndex] = {
         ...campaign,
         raised: `${newRaised.toFixed(1)} ETH`,
         percentage: Math.min(100, Math.round((newRaised / goal) * 100)),
         donors: (campaign.donors || 0) + 1,
       };
-      
-      sessionStorage.setItem('userCampaigns', JSON.stringify(campaigns));
+
+      sessionStorage.setItem("userCampaigns", JSON.stringify(campaigns));
     }
   } catch (error) {
-    console.error('Error updating campaign:', error);
+    console.error("Error updating campaign:", error);
   }
 }
 
@@ -392,3 +405,84 @@ export function getETHPriceInfo() {
   };
 }
 
+/**
+ * Initialize default campaigns for demo users
+ */
+export function initializeDefaultCampaigns(): void {
+  if (typeof window === "undefined") return;
+
+  // Check if campaigns already exist
+  const existing = sessionStorage.getItem("userCampaigns");
+  if (existing) return;
+
+  const defaultCampaigns = [
+    {
+      id: "user-campaign-1",
+      title: "Community Food Bank Drive",
+      goal: "50 ETH",
+      raised: "32.5 ETH",
+      percentage: 65,
+      status: "active",
+      chain: "Ethereum",
+      category: "Community",
+      deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+      donors: 47,
+      description: "Help us provide meals to families in need",
+      verified: true,
+      location: "Manila, Philippines",
+    },
+    {
+      id: "user-campaign-2",
+      title: "Medical Equipment for Rural Clinics",
+      goal: "75 ETH",
+      raised: "58.8 ETH",
+      percentage: 78,
+      status: "active",
+      chain: "Ethereum",
+      category: "Healthcare",
+      deadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString(), // 45 days from now
+      donors: 112,
+      description:
+        "Fund essential medical equipment for underserved communities",
+      verified: true,
+      location: "Cebu, Philippines",
+    },
+    {
+      id: "user-campaign-3",
+      title: "School Supplies for 500 Students",
+      goal: "25 ETH",
+      raised: "25 ETH",
+      percentage: 100,
+      status: "completed",
+      chain: "Ethereum",
+      category: "Education",
+      deadline: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
+      donors: 89,
+      description: "Provide school supplies for students in remote areas",
+      verified: true,
+      location: "Davao, Philippines",
+    },
+  ];
+
+  sessionStorage.setItem("userCampaigns", JSON.stringify(defaultCampaigns));
+}
+
+/**
+ * Get user campaigns (with default initialization)
+ */
+export function getUserCampaigns(): any[] {
+  if (typeof window === "undefined") return [];
+
+  // Initialize defaults if needed
+  initializeDefaultCampaigns();
+
+  const campaignsData = sessionStorage.getItem("userCampaigns");
+  if (!campaignsData) return [];
+
+  try {
+    return JSON.parse(campaignsData);
+  } catch (error) {
+    console.error("Error parsing campaigns:", error);
+    return [];
+  }
+}

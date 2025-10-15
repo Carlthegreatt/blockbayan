@@ -38,33 +38,35 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
-    // Simulate API call delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Check credentials against dummy data
-    const user = DUMMY_USERS.find(
-      (u) => u.email === email && u.password === password
-    );
-
-    if (user) {
-      console.log("Login successful:", {
-        email: user.email,
-        name: user.name,
-        type: user.type,
+    try {
+      // Call login API
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       });
-      // Store user data in sessionStorage (in production, use proper session management)
-      sessionStorage.setItem(
-        "user",
-        JSON.stringify({ email: user.email, name: user.name, type: user.type })
-      );
-      // Redirect to explore page (main app)
-      router.push("/explore");
-    } else {
-      setError("Invalid email or password");
-      console.log("Login failed:", { email, password });
-    }
 
-    setIsLoading(false);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+
+      console.log("Login successful:", data.user);
+
+      // Store user data in sessionStorage
+      sessionStorage.setItem("user", JSON.stringify(data.user));
+
+      // Redirect to dashboard
+      router.push("/dashboard");
+    } catch (error: any) {
+      setError(error.message || "Invalid email or password");
+      console.error("Login failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

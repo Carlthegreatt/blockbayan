@@ -1,21 +1,26 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-type AccountType = "personal" | "organization" | null
-type SignupStep = "account-type" | "credentials" | "id-upload" | "face-verification" | "complete"
+type AccountType = "personal" | "organization" | null;
+type SignupStep =
+  | "account-type"
+  | "credentials"
+  | "id-upload"
+  | "face-verification"
+  | "complete";
 
 export default function SignupPage() {
-  const [currentStep, setCurrentStep] = useState<SignupStep>("account-type")
-  const [accountType, setAccountType] = useState<AccountType>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [currentStep, setCurrentStep] = useState<SignupStep>("account-type");
+  const [accountType, setAccountType] = useState<AccountType>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Form data
   const [formData, setFormData] = useState({
@@ -33,55 +38,92 @@ export default function SignupPage() {
     validIdBack: null as File | null,
     // Verification
     faceVerified: false,
-  })
+  });
 
   const handleAccountTypeSelect = (type: AccountType) => {
-    setAccountType(type)
-    setCurrentStep("credentials")
-  }
+    setAccountType(type);
+    setCurrentStep("credentials");
+  };
 
   const handleCredentialsSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!")
-      return
+      alert("Passwords do not match!");
+      return;
     }
     if (!formData.acceptedTerms) {
-      alert("Please accept the terms and conditions")
-      return
+      alert("Please accept the terms and conditions");
+      return;
     }
-    setCurrentStep("id-upload")
-  }
+    setCurrentStep("id-upload");
+  };
 
   const handleIdUpload = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!formData.validIdFront || !formData.validIdBack) {
-      alert("Please upload both front and back of your valid ID")
-      return
+      alert("Please upload both front and back of your valid ID");
+      return;
     }
-    setCurrentStep("face-verification")
-  }
+    setCurrentStep("face-verification");
+  };
 
   const handleFaceVerification = async () => {
-    setIsLoading(true)
-    // Simulate face verification process
-    await new Promise((resolve) => setTimeout(resolve, 2000))
-    setFormData({ ...formData, faceVerified: true })
-    setIsLoading(false)
-    setCurrentStep("complete")
-  }
+    setIsLoading(true);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: "validIdFront" | "validIdBack") => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData({ ...formData, [field]: e.target.files[0] })
+    try {
+      // Simulate face verification process
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setFormData({ ...formData, faceVerified: true });
+
+      // Submit to API
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          name:
+            accountType === "organization"
+              ? formData.organizationName
+              : formData.name,
+          userType: accountType === "organization" ? "organization" : "donor",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Signup failed");
+      }
+
+      // Store user session
+      sessionStorage.setItem("user", JSON.stringify(data.user));
+
+      setIsLoading(false);
+      setCurrentStep("complete");
+    } catch (error: any) {
+      setIsLoading(false);
+      alert(error.message || "Signup failed. Please try again.");
+      console.error("Signup error:", error);
     }
-  }
+  };
+
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    field: "validIdFront" | "validIdBack"
+  ) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData({ ...formData, [field]: e.target.files[0] });
+    }
+  };
 
   const stepVariants = {
     hidden: { opacity: 0, x: 20 },
     visible: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: -20 },
-  }
+  };
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
@@ -89,8 +131,18 @@ export default function SignupPage() {
         href="/"
         className="absolute top-6 left-6 z-20 text-zinc-400 hover:text-[#e78a53] transition-colors duration-200 flex items-center space-x-2"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          />
         </svg>
         <span>Back to Home</span>
       </Link>
@@ -119,8 +171,12 @@ export default function SignupPage() {
               />
             </div>
           </Link>
-          <h1 className="text-3xl font-bold text-white mb-2">Create your account</h1>
-          <p className="text-zinc-400">Join BlockBayan and start your blockchain journey</p>
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Create your account
+          </h1>
+          <p className="text-zinc-400">
+            Join BlockBayan and start your blockchain journey
+          </p>
         </div>
 
         {/* Progress Indicator */}
@@ -140,18 +196,22 @@ export default function SignupPage() {
                       currentStep === step.id
                         ? "bg-[#e78a53] text-white"
                         : arr.findIndex((s) => s.id === currentStep) > index
-                          ? "bg-[#e78a53]/50 text-white"
-                          : "bg-zinc-800 text-zinc-500"
+                        ? "bg-[#e78a53]/50 text-white"
+                        : "bg-zinc-800 text-zinc-500"
                     }`}
                   >
                     {index + 1}
                   </div>
-                  <span className="text-xs text-zinc-500 mt-1 hidden md:block">{step.label}</span>
+                  <span className="text-xs text-zinc-500 mt-1 hidden md:block">
+                    {step.label}
+                  </span>
                 </div>
                 {index < arr.length - 1 && (
                   <div
                     className={`h-0.5 flex-1 ${
-                      arr.findIndex((s) => s.id === currentStep) > index ? "bg-[#e78a53]/50" : "bg-zinc-800"
+                      arr.findIndex((s) => s.id === currentStep) > index
+                        ? "bg-[#e78a53]/50"
+                        : "bg-zinc-800"
                     }`}
                   />
                 )}
@@ -180,8 +240,12 @@ export default function SignupPage() {
                 className="space-y-6"
               >
                 <div className="text-center mb-6">
-                  <h2 className="text-2xl font-bold text-white mb-2">Choose Account Type</h2>
-                  <p className="text-zinc-400">Select the type of account you want to create</p>
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    Choose Account Type
+                  </h2>
+                  <p className="text-zinc-400">
+                    Select the type of account you want to create
+                  </p>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4">
@@ -206,8 +270,12 @@ export default function SignupPage() {
                         </svg>
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-white">Personal Account</h3>
-                        <p className="text-sm text-zinc-400">For individual users</p>
+                        <h3 className="text-lg font-semibold text-white">
+                          Personal Account
+                        </h3>
+                        <p className="text-sm text-zinc-400">
+                          For individual users
+                        </p>
                       </div>
                     </div>
                   </button>
@@ -233,8 +301,12 @@ export default function SignupPage() {
                         </svg>
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-white">Organization Account</h3>
-                        <p className="text-sm text-zinc-400">For businesses & orgs</p>
+                        <h3 className="text-lg font-semibold text-white">
+                          Organization Account
+                        </h3>
+                        <p className="text-sm text-zinc-400">
+                          For businesses & orgs
+                        </p>
                       </div>
                     </div>
                   </button>
@@ -254,16 +326,24 @@ export default function SignupPage() {
               >
                 <div className="text-center mb-6">
                   <h2 className="text-2xl font-bold text-white mb-2">
-                    {accountType === "organization" ? "Organization" : "Personal"} Information
+                    {accountType === "organization"
+                      ? "Organization"
+                      : "Personal"}{" "}
+                    Information
                   </h2>
-                  <p className="text-zinc-400">Enter your details and accept our terms</p>
+                  <p className="text-zinc-400">
+                    Enter your details and accept our terms
+                  </p>
                 </div>
 
                 <form onSubmit={handleCredentialsSubmit} className="space-y-4">
                   {accountType === "organization" && (
                     <>
                       <div className="space-y-2">
-                        <Label htmlFor="organizationName" className="text-white">
+                        <Label
+                          htmlFor="organizationName"
+                          className="text-white"
+                        >
                           Organization Name
                         </Label>
                         <Input
@@ -271,14 +351,22 @@ export default function SignupPage() {
                           type="text"
                           placeholder="Enter organization name"
                           value={formData.organizationName}
-                          onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              organizationName: e.target.value,
+                            })
+                          }
                           className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-[#e78a53] focus:ring-[#e78a53]/20"
                           required
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="organizationAddress" className="text-white">
+                        <Label
+                          htmlFor="organizationAddress"
+                          className="text-white"
+                        >
                           Organization Address
                         </Label>
                         <Input
@@ -286,7 +374,12 @@ export default function SignupPage() {
                           type="text"
                           placeholder="Enter organization address"
                           value={formData.organizationAddress}
-                          onChange={(e) => setFormData({ ...formData, organizationAddress: e.target.value })}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              organizationAddress: e.target.value,
+                            })
+                          }
                           className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-[#e78a53] focus:ring-[#e78a53]/20"
                           required
                         />
@@ -296,14 +389,18 @@ export default function SignupPage() {
 
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-white">
-                      {accountType === "organization" ? "Contact Person Name" : "Full Name"}
+                      {accountType === "organization"
+                        ? "Contact Person Name"
+                        : "Full Name"}
                     </Label>
                     <Input
                       id="name"
                       type="text"
                       placeholder="Enter your full name"
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
                       className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-[#e78a53] focus:ring-[#e78a53]/20"
                       required
                     />
@@ -318,7 +415,9 @@ export default function SignupPage() {
                       type="email"
                       placeholder="Enter your email"
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
                       className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-[#e78a53] focus:ring-[#e78a53]/20"
                       required
                     />
@@ -333,7 +432,9 @@ export default function SignupPage() {
                       type="password"
                       placeholder="Create a strong password"
                       value={formData.password}
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
                       className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-[#e78a53] focus:ring-[#e78a53]/20"
                       required
                     />
@@ -348,7 +449,12 @@ export default function SignupPage() {
                       type="password"
                       placeholder="Confirm your password"
                       value={formData.confirmPassword}
-                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          confirmPassword: e.target.value,
+                        })
+                      }
                       className="bg-zinc-800/50 border-zinc-700 text-white placeholder:text-zinc-500 focus:border-[#e78a53] focus:ring-[#e78a53]/20"
                       required
                     />
@@ -359,17 +465,28 @@ export default function SignupPage() {
                       <input
                         type="checkbox"
                         checked={formData.acceptedTerms}
-                        onChange={(e) => setFormData({ ...formData, acceptedTerms: e.target.checked })}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            acceptedTerms: e.target.checked,
+                          })
+                        }
                         className="mt-1 rounded border-zinc-700 bg-zinc-800 text-[#e78a53] focus:ring-[#e78a53]/20"
                         required
                       />
                       <span className="text-zinc-300">
                         I agree to the{" "}
-                        <Link href="#" className="text-[#e78a53] hover:text-[#e78a53]/80">
+                        <Link
+                          href="#"
+                          className="text-[#e78a53] hover:text-[#e78a53]/80"
+                        >
                           Terms and Conditions
                         </Link>{" "}
                         and{" "}
-                        <Link href="#" className="text-[#e78a53] hover:text-[#e78a53]/80">
+                        <Link
+                          href="#"
+                          className="text-[#e78a53] hover:text-[#e78a53]/80"
+                        >
                           Privacy Policy
                         </Link>
                       </span>
@@ -407,8 +524,12 @@ export default function SignupPage() {
                 transition={{ duration: 0.3 }}
               >
                 <div className="text-center mb-6">
-                  <h2 className="text-2xl font-bold text-white mb-2">Upload Valid ID</h2>
-                  <p className="text-zinc-400">Please upload both sides of your government-issued ID</p>
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    Upload Valid ID
+                  </h2>
+                  <p className="text-zinc-400">
+                    Please upload both sides of your government-issued ID
+                  </p>
                 </div>
 
                 <form onSubmit={handleIdUpload} className="space-y-6">
@@ -445,7 +566,9 @@ export default function SignupPage() {
                                   d="M5 13l4 4L19 7"
                                 />
                               </svg>
-                              <p className="text-sm text-zinc-300">{formData.validIdFront.name}</p>
+                              <p className="text-sm text-zinc-300">
+                                {formData.validIdFront.name}
+                              </p>
                             </div>
                           ) : (
                             <div className="text-center">
@@ -462,7 +585,9 @@ export default function SignupPage() {
                                   d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                                 />
                               </svg>
-                              <p className="text-sm text-zinc-400">Click to upload front side</p>
+                              <p className="text-sm text-zinc-400">
+                                Click to upload front side
+                              </p>
                             </div>
                           )}
                         </label>
@@ -501,7 +626,9 @@ export default function SignupPage() {
                                   d="M5 13l4 4L19 7"
                                 />
                               </svg>
-                              <p className="text-sm text-zinc-300">{formData.validIdBack.name}</p>
+                              <p className="text-sm text-zinc-300">
+                                {formData.validIdBack.name}
+                              </p>
                             </div>
                           ) : (
                             <div className="text-center">
@@ -518,7 +645,9 @@ export default function SignupPage() {
                                   d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                                 />
                               </svg>
-                              <p className="text-sm text-zinc-400">Click to upload back side</p>
+                              <p className="text-sm text-zinc-400">
+                                Click to upload back side
+                              </p>
                             </div>
                           )}
                         </label>
@@ -528,8 +657,9 @@ export default function SignupPage() {
 
                   <div className="bg-zinc-800/30 border border-zinc-700 rounded-lg p-4">
                     <p className="text-xs text-zinc-400">
-                      <strong className="text-zinc-300">Accepted IDs:</strong> Passport, Driver's License, National
-                      ID, or any government-issued identification document
+                      <strong className="text-zinc-300">Accepted IDs:</strong>{" "}
+                      Passport, Driver's License, National ID, or any
+                      government-issued identification document
                     </p>
                   </div>
 
@@ -565,8 +695,12 @@ export default function SignupPage() {
                 className="text-center"
               >
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-white mb-2">Face Verification</h2>
-                  <p className="text-zinc-400">We need to verify your identity to complete registration</p>
+                  <h2 className="text-2xl font-bold text-white mb-2">
+                    Face Verification
+                  </h2>
+                  <p className="text-zinc-400">
+                    We need to verify your identity to complete registration
+                  </p>
                 </div>
 
                 <div className="mb-8">
@@ -637,22 +771,39 @@ export default function SignupPage() {
                 className="text-center py-8"
               >
                 <div className="w-20 h-20 mx-auto mb-6 bg-[#e78a53]/10 rounded-full flex items-center justify-center">
-                  <svg className="w-10 h-10 text-[#e78a53]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-10 h-10 text-[#e78a53]"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
 
-                <h2 className="text-3xl font-bold text-white mb-2">Account Created!</h2>
+                <h2 className="text-3xl font-bold text-white mb-2">
+                  Account Created!
+                </h2>
                 <p className="text-zinc-400 mb-8">
-                  Your {accountType} account has been successfully created and verified
+                  Your {accountType} account has been successfully created and
+                  verified
                 </p>
 
                 <div className="bg-zinc-800/30 border border-zinc-700 rounded-lg p-6 mb-8 text-left">
-                  <h3 className="text-sm font-semibold text-white mb-4">Account Summary:</h3>
+                  <h3 className="text-sm font-semibold text-white mb-4">
+                    Account Summary:
+                  </h3>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-zinc-400">Account Type:</span>
-                      <span className="text-white capitalize">{accountType}</span>
+                      <span className="text-white capitalize">
+                        {accountType}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-zinc-400">Email:</span>
@@ -665,7 +816,9 @@ export default function SignupPage() {
                     {accountType === "organization" && (
                       <div className="flex justify-between">
                         <span className="text-zinc-400">Organization:</span>
-                        <span className="text-white">{formData.organizationName}</span>
+                        <span className="text-white">
+                          {formData.organizationName}
+                        </span>
                       </div>
                     )}
                     <div className="flex justify-between">
@@ -696,7 +849,10 @@ export default function SignupPage() {
           >
             <p className="text-zinc-400">
               Already have an account?{" "}
-              <Link href="/login" className="text-[#e78a53] hover:text-[#e78a53]/80 font-medium">
+              <Link
+                href="/login"
+                className="text-[#e78a53] hover:text-[#e78a53]/80 font-medium"
+              >
                 Sign in
               </Link>
             </p>
@@ -704,5 +860,5 @@ export default function SignupPage() {
         )}
       </motion.div>
     </div>
-  )
+  );
 }

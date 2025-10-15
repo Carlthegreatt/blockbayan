@@ -36,6 +36,8 @@ import {
   saveWalletData,
   ethToPHP,
   getTransactions,
+  getUserCampaigns,
+  initializeDefaultCampaigns,
 } from "@/store/walletStore";
 import { WALLET_OPTIONS } from "@/config/wallets";
 
@@ -135,16 +137,10 @@ export default function DashboardPage() {
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    // Load user campaigns from sessionStorage
-    const storedCampaigns = sessionStorage.getItem("userCampaigns");
-    if (storedCampaigns) {
-      try {
-        const campaigns = JSON.parse(storedCampaigns);
-        setUserCampaigns(campaigns);
-      } catch (error) {
-        console.error("Error loading campaigns:", error);
-      }
-    }
+    // Initialize default campaigns and load user campaigns
+    initializeDefaultCampaigns();
+    const campaigns = getUserCampaigns();
+    setUserCampaigns(campaigns);
 
     // Load wallet connection data using wallet store
     const wallet = getWalletData();
@@ -191,14 +187,14 @@ export default function DashboardPage() {
         "0x5a8c6D9f2E4b7A1c3F5e8B0d2A4c6E8f1B3d5A7",
       ];
 
-      const randomAddress =
+      const fullAddress =
         mockAddresses[Math.floor(Math.random() * mockAddresses.length)];
 
       // Truncate address for display
-      const truncatedAddress = `${randomAddress.slice(
+      const truncatedAddress = `${fullAddress.slice(
         0,
         6
-      )}...${randomAddress.slice(-4)}`;
+      )}...${fullAddress.slice(-4)}`;
 
       setConnectedWallet(walletId);
       setConnectedAddress(truncatedAddress);
@@ -212,10 +208,10 @@ export default function DashboardPage() {
         balance = (Math.random() * 10 + 5).toFixed(4);
       }
 
-      // Save wallet connection using wallet store
+      // Save wallet connection using wallet store (save full address)
       saveWalletData({
         connected: true,
-        address: truncatedAddress,
+        address: fullAddress, // Save full address, not truncated
         type: walletId,
         balance: balance,
         network: "Ethereum",
