@@ -430,6 +430,7 @@ export function initializeDefaultCampaigns(): void {
       description: "Help us provide meals to families in need",
       verified: true,
       location: "Manila, Philippines",
+      image: "https://foodbank.org.ph/wp-content/uploads/2024/01/bulusan-21.png",
     },
     {
       id: "user-campaign-2",
@@ -446,6 +447,7 @@ export function initializeDefaultCampaigns(): void {
         "Fund essential medical equipment for underserved communities",
       verified: true,
       location: "Cebu, Philippines",
+      image: "https://images.unsplash.com/photo-1516841273335-e39b37888115?w=800&auto=format&fit=crop",
     },
     {
       id: "user-campaign-3",
@@ -461,6 +463,7 @@ export function initializeDefaultCampaigns(): void {
       description: "Provide school supplies for students in remote areas",
       verified: true,
       location: "Davao, Philippines",
+      image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&auto=format&fit=crop",
     },
   ];
 
