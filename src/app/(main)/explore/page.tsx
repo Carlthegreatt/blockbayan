@@ -49,8 +49,7 @@ const mockCampaigns = [
     deadline: "2025-11-30",
     chain: "Ethereum",
     location: "Mindanao, Philippines",
-    image:
-      "https://mindanews.com/wp-content/uploads/2020/07/28haran11.jpg",
+    image: "https://mindanews.com/wp-content/uploads/2020/07/28haran11.jpg",
     creator: {
       name: "Maria Santos",
       address: "0x8e3b...A1d9",
@@ -383,7 +382,8 @@ export default function ExplorePage() {
                                 <div className="flex items-center gap-1">
                                   <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                                   <span className="text-xs text-muted-foreground">
-                                    {creatorRep.rating} ({creatorRep.totalReviews})
+                                    {creatorRep.rating} (
+                                    {creatorRep.totalReviews})
                                   </span>
                                 </div>
                               </div>
@@ -478,7 +478,9 @@ export default function ExplorePage() {
 
                               {/* Creator Info in List View */}
                               {campaign.creator && creatorRep && (
-                                <Link href={`/dashboard/${campaign.creator.address}`}>
+                                <Link
+                                  href={`/dashboard/${campaign.creator.address}`}
+                                >
                                   <div className="flex items-center gap-2 mb-3 hover:bg-muted/50 p-1 rounded transition-colors cursor-pointer w-fit">
                                     <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                                       <span className="text-xs font-semibold text-primary">
