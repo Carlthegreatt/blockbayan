@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { ToastProvider } from "@/components/ui/toast";
 import "./globals.css";
+import "driver.js/dist/driver.css";
 
 export const metadata: Metadata = {
   title: "BlockBayan",
