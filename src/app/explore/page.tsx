@@ -27,7 +27,7 @@ import {
   Download,
 } from "lucide-react";
 import Link from "next/link";
-import { ethToPHP } from "@/store/walletStore";
+import { ethToPHP, getTransactions } from "@/store/walletStore";
 
 // Mock campaigns data
 const mockCampaigns = [
@@ -46,8 +46,7 @@ const mockCampaigns = [
     deadline: "2025-11-30",
     chain: "Ethereum",
     location: "Mindanao, Philippines",
-    image:
-      "https://mindanews.com/wp-content/uploads/2020/07/28haran11.jpg",
+    image: "https://mindanews.com/wp-content/uploads/2020/07/28haran11.jpg",
   },
   {
     id: "2",
@@ -180,6 +179,7 @@ export default function ExplorePage() {
   const [campaigns, setCampaigns] = useState(mockCampaigns);
   const [selectedCategory, setSelectedCategory] =
     useState<string>("All Categories");
+  const [transactions, setTransactions] = useState<any[]>([]);
 
   useEffect(() => {
     // Load user campaigns from sessionStorage and merge with mock campaigns
@@ -202,6 +202,12 @@ export default function ExplorePage() {
         setCampaigns(mockCampaigns);
       }
     }
+
+    // Load transactions from wallet store
+    const realTransactions = getTransactions();
+    // Combine real transactions with mock transactions for better display
+    const combined = [...realTransactions, ...mockTransactions];
+    setTransactions(combined);
   }, []);
 
   // Filter campaigns based on search and category
@@ -559,7 +565,7 @@ export default function ExplorePage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                      {mockTransactions.map((tx) => (
+                      {transactions.map((tx) => (
                         <tr
                           key={tx.id}
                           className="hover:bg-muted/50 transition-colors"

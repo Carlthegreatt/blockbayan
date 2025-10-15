@@ -30,7 +30,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { getWalletData, saveWalletData, ethToPHP } from "@/store/walletStore";
+import {
+  getWalletData,
+  saveWalletData,
+  ethToPHP,
+  getTransactions,
+} from "@/store/walletStore";
 
 // Wallet options data
 interface WalletOption {
@@ -171,6 +176,7 @@ export default function DashboardPage() {
   const [userCampaigns, setUserCampaigns] = useState<typeof mockCampaigns>([]);
   const [selectedCampaignForWithdraw, setSelectedCampaignForWithdraw] =
     useState<(typeof mockCampaigns)[0] | null>(null);
+  const [transactions, setTransactions] = useState<any[]>([]);
 
   // Wallet connection state
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
@@ -199,7 +205,22 @@ export default function DashboardPage() {
       setConnectedAddress(wallet.address);
       setConnectedWallet(wallet.type);
     }
-  }, []);
+
+    // Load transactions from wallet store
+    const loadTransactions = () => {
+      const realTransactions = getTransactions();
+      // Combine real transactions with mock transactions for better display
+      const combined = [...realTransactions, ...mockTransactions];
+      setTransactions(combined);
+    };
+
+    loadTransactions();
+
+    // Reload transactions when tab changes to ledger or my_donations
+    if (activeTab === "ledger" || activeTab === "my_donations") {
+      loadTransactions();
+    }
+  }, [activeTab]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -249,7 +270,7 @@ export default function DashboardPage() {
         address: truncatedAddress,
         type: walletId,
         balance: balance,
-        network: 'Ethereum',
+        network: "Ethereum",
       });
     } catch (err) {
       setError("Failed to connect wallet. Please try again.");
@@ -261,9 +282,9 @@ export default function DashboardPage() {
     setWalletConnected(false);
     setConnectedWallet("");
     setConnectedAddress("");
-    
+
     // Import disconnectWallet from wallet store
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       localStorage.removeItem("wallet");
       sessionStorage.removeItem("wallet");
       sessionStorage.removeItem("walletBalance");
@@ -493,7 +514,7 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {mockTransactions.map((tx) => (
+                  {transactions.slice(0, 5).map((tx) => (
                     <div
                       key={tx.id}
                       className="flex items-center justify-between border-b border-border pb-4 last:border-0 last:pb-0"
@@ -658,59 +679,64 @@ export default function DashboardPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                      {mockDonations.map((donation) => (
-                        <tr
-                          key={donation.id}
-                          className="hover:bg-muted/50 transition-colors"
-                        >
-                          <td className="px-6 py-4">
-                            <p className="font-medium">{donation.campaign}</p>
-                          </td>
-                          <td className="px-6 py-4">
-                            <p className="font-semibold">{donation.amount}</p>
-                          </td>
-                          <td className="px-6 py-4 text-sm text-muted-foreground">
-                            {new Date(donation.date).toLocaleDateString()}
-                          </td>
-                          <td className="px-6 py-4">
-                            <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-500/10 text-green-500">
-                              {donation.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="flex items-center justify-end space-x-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8"
-                                onClick={() =>
-                                  openInExplorer(donation.txHash, "Ethereum")
-                                }
-                              >
-                                <ExternalLink className="h-4 w-4 mr-1" />
-                                Explorer
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8"
-                                onClick={() => {
-                                  generateReceipt({
-                                    campaign: donation.campaign,
-                                    amount: donation.amount,
-                                    txHash: donation.txHash,
-                                    date: donation.date,
-                                  });
-                                  showToast("Receipt downloaded!");
-                                }}
-                              >
-                                <Download className="h-4 w-4 mr-1" />
-                                Receipt
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                      {transactions
+                        .filter((tx) => tx.type === "donation")
+                        .map((donation) => (
+                          <tr
+                            key={donation.id}
+                            className="hover:bg-muted/50 transition-colors"
+                          >
+                            <td className="px-6 py-4">
+                              <p className="font-medium">{donation.campaign}</p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="font-semibold">{donation.amount}</p>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-muted-foreground">
+                              {donation.timestamp}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-500/10 text-green-500">
+                                {donation.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex items-center justify-end space-x-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8"
+                                  onClick={() =>
+                                    openInExplorer(
+                                      donation.txHash,
+                                      donation.to || "Ethereum"
+                                    )
+                                  }
+                                >
+                                  <ExternalLink className="h-4 w-4 mr-1" />
+                                  Explorer
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-8"
+                                  onClick={() => {
+                                    generateReceipt({
+                                      campaign: donation.campaign || "Campaign",
+                                      amount: donation.amount,
+                                      txHash: donation.txHash,
+                                      date: donation.timestamp,
+                                    });
+                                    showToast("Receipt downloaded!");
+                                  }}
+                                >
+                                  <Download className="h-4 w-4 mr-1" />
+                                  Receipt
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
                     </tbody>
                   </table>
                 </div>
@@ -757,7 +783,7 @@ export default function DashboardPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                      {mockTransactions.map((tx) => (
+                      {transactions.map((tx) => (
                         <tr
                           key={tx.id}
                           className="hover:bg-muted/50 transition-colors"
