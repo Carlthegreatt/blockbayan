@@ -9,9 +9,19 @@ export interface Campaign {
   status?: "active" | "completed" | "closed";
   startDate?: string;
   endDate?: string;
+  deadline?: string;
   image?: string;
   organizerAddress?: string;
   backers?: number;
+  donors?: number;
+  percentage?: number;
+  verified?: boolean;
+  location?: string;
+  creator?: {
+    name: string;
+    address: string;
+    avatar: string;
+  };
 }
 
 export interface CampaignStats {
