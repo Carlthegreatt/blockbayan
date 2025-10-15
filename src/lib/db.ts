@@ -4,6 +4,15 @@ import crypto from "crypto";
 
 const DB_PATH = path.join(process.cwd(), "data", "users.json");
 
+// Check if we're in a production environment with restricted file access
+const isProduction = process.env.NODE_ENV === "production";
+const isVercel = process.env.VERCEL === "1";
+const isNetlify = process.env.NETLIFY === "true";
+const isRailway = process.env.RAILWAY_ENVIRONMENT !== undefined;
+
+// Use fallback for serverless environments
+const useFallback = isVercel || isNetlify || isRailway;
+
 export interface User {
   id: string;
   email: string;
@@ -17,41 +26,84 @@ export interface User {
 
 // Ensure database file exists
 function ensureDbExists() {
-  const dataDir = path.join(process.cwd(), "data");
+  try {
+    const dataDir = path.join(process.cwd(), "data");
 
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
 
-  if (!fs.existsSync(DB_PATH)) {
-    fs.writeFileSync(DB_PATH, JSON.stringify({ users: [] }, null, 2));
+    if (!fs.existsSync(DB_PATH)) {
+      fs.writeFileSync(DB_PATH, JSON.stringify({ users: [] }, null, 2));
+    }
+  } catch (error) {
+    console.error("Error ensuring database exists:", error);
+    throw new Error("Failed to initialize database");
   }
 }
 
 // Read all users
 export function readUsers(): User[] {
-  ensureDbExists();
+  if (useFallback) {
+    // Import fallback dynamically to avoid issues
+    try {
+      const { readUsersFallback } = require("./db-fallback");
+      return readUsersFallback();
+    } catch (error) {
+      console.error("Fallback database error:", error);
+      return [];
+    }
+  }
 
   try {
+    ensureDbExists();
+
     const data = fs.readFileSync(DB_PATH, "utf-8");
     const db = JSON.parse(data);
     return db.users || [];
   } catch (error) {
     console.error("Error reading users:", error);
+    // Return empty array instead of throwing to prevent crashes
     return [];
   }
 }
 
 // Write users
 function writeUsers(users: User[]): void {
-  ensureDbExists();
+  if (useFallback) {
+    try {
+      const { writeUsersFallback } = require("./db-fallback");
+      writeUsersFallback(users);
+      return;
+    } catch (error) {
+      console.error("Fallback write error:", error);
+      throw new Error("Failed to save user data");
+    }
+  }
 
-  const db = { users };
-  fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
+  try {
+    ensureDbExists();
+
+    const db = { users };
+    fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
+  } catch (error) {
+    console.error("Error writing users:", error);
+    throw new Error("Failed to save user data");
+  }
 }
 
 // Find user by email
 export function findUserByEmail(email: string): User | null {
+  if (useFallback) {
+    try {
+      const { findUserByEmailFallback } = require("./db-fallback");
+      return findUserByEmailFallback(email);
+    } catch (error) {
+      console.error("Fallback find user error:", error);
+      return null;
+    }
+  }
+
   const users = readUsers();
   return (
     users.find((u) => u.email.toLowerCase() === email.toLowerCase()) || null
@@ -68,6 +120,16 @@ export function findUserById(id: string): User | null {
 export function createUser(
   userData: Omit<User, "id" | "createdAt" | "updatedAt">
 ): User {
+  if (useFallback) {
+    try {
+      const { createUserFallback } = require("./db-fallback");
+      return createUserFallback(userData);
+    } catch (error) {
+      console.error("Fallback create user error:", error);
+      throw error;
+    }
+  }
+
   const users = readUsers();
 
   // Check if email already exists
@@ -132,6 +194,16 @@ export function hashPassword(password: string): string {
 
 // Verify password
 export function verifyPassword(password: string, hash: string): boolean {
+  if (useFallback) {
+    try {
+      const { verifyPasswordFallback } = require("./db-fallback");
+      return verifyPasswordFallback(password, hash);
+    } catch (error) {
+      console.error("Fallback verify password error:", error);
+      return false;
+    }
+  }
+
   return hashPassword(password) === hash;
 }
 

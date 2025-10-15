@@ -61,6 +61,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (
+      error.message === "Failed to initialize database" ||
+      error.message === "Failed to save user data"
+    ) {
+      return NextResponse.json(
+        { error: "Database error. Please try again." },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

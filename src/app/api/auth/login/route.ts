@@ -45,8 +45,15 @@ export async function POST(request: NextRequest) {
       },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Login error:", error);
+
+    if (error.message === "Failed to initialize database") {
+      return NextResponse.json(
+        { error: "Database error. Please try again." },
+        { status: 503 }
+      );
+    }
 
     return NextResponse.json(
       { error: "Internal server error" },
