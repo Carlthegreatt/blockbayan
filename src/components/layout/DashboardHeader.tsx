@@ -16,9 +16,9 @@ import {
   ExternalLink,
   Bell,
 } from "lucide-react";
-import WalletConnectModal from "@/components/modals/WalletConnectModal";
-import SettingsModal from "@/components/modals/SettingsModal";
-import ETHPriceTicker from "@/components/ETHPriceTicker";
+import WalletConnectModal from "@/components/features/modals/WalletConnectModal";
+import SettingsModal from "@/components/features/modals/SettingsModal";
+import ETHPriceTicker from "@/components/shared/ETHPriceTicker";
 import {
   getWalletData,
   saveWalletData,

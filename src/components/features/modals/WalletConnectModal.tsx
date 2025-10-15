@@ -1,61 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { X, Wallet, CheckCircle2, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-
-interface WalletOption {
-  id: string;
-  name: string;
-  icon: string;
-  description: string;
-  installed?: boolean;
-}
-
-const walletOptions: WalletOption[] = [
-  {
-    id: "metamask",
-    name: "MetaMask",
-    icon: "🦊",
-    description: "Connect with MetaMask browser extension",
-    installed: true,
-  },
-  {
-    id: "walletconnect",
-    name: "WalletConnect",
-    icon: "📱",
-    description: "Scan QR code with your mobile wallet",
-    installed: true,
-  },
-  {
-    id: "coinbase",
-    name: "Coinbase Wallet",
-    icon: "🔵",
-    description: "Connect with Coinbase Wallet",
-    installed: true,
-  },
-  {
-    id: "trustwallet",
-    name: "Trust Wallet",
-    icon: "🛡️",
-    description: "Connect with Trust Wallet",
-    installed: false,
-  },
-  {
-    id: "phantom",
-    name: "Phantom",
-    icon: "👻",
-    description: "Connect with Phantom wallet",
-    installed: false,
-  },
-  {
-    id: "rainbow",
-    name: "Rainbow",
-    icon: "🌈",
-    description: "Connect with Rainbow wallet",
-    installed: false,
-  },
-];
+import { WALLET_OPTIONS } from "@/config/wallets";
 
 interface WalletConnectModalProps {
   isOpen: boolean;
@@ -159,7 +108,7 @@ export default function WalletConnectModal({
                   </motion.div>
                 )}
 
-                {walletOptions.map((wallet, index) => (
+                {WALLET_OPTIONS.map((wallet, index) => (
                   <motion.button
                     key={wallet.id}
                     initial={{ opacity: 0, x: -20 }}
@@ -174,7 +123,14 @@ export default function WalletConnectModal({
                     } ${!wallet.installed ? "opacity-60" : ""}`}
                   >
                     <div className="flex items-center space-x-4">
-                      <div className="text-4xl">{wallet.icon}</div>
+                      <div className="relative h-10 w-10 flex-shrink-0">
+                        <Image
+                          src={wallet.icon}
+                          alt={wallet.name}
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
                       <div className="text-left">
                         <div className="flex items-center space-x-2">
                           <p className="font-semibold text-base">

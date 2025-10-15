@@ -1,47 +1,48 @@
-"use client"
-import { useState, useEffect } from "react"
-import Hero from "@/components/sections/hero"
-import Features from "@/components/sections/features"
-import { TestimonialsSection } from "@/components/sections/testimonials"
-import { NewReleasePromo } from "@/components/sections/new-release-promo"
-import { FAQSection } from "@/components/sections/faq-section"
-import { StickyFooter } from "@/components/sticky-footer"
+"use client";
+import { useState, useEffect } from "react";
+import Hero from "@/components/sections/hero";
+import Features from "@/components/sections/features";
+import { TestimonialsSection } from "@/components/sections/testimonials";
+import { NewReleasePromo } from "@/components/sections/new-release-promo";
+import { FAQSection } from "@/components/sections/faq-section";
+import { StickyFooter } from "@/components/shared/sticky-footer";
 
 export default function Home() {
-  const [isScrolled, setIsScrolled] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const root = window.document.documentElement
-    root.classList.remove("light", "system")
-    root.classList.add("dark")
-  }, [])
+    const root = window.document.documentElement;
+    root.classList.remove("light", "system");
+    root.classList.add("dark");
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100)
-    }
+      setIsScrolled(window.scrollY > 100);
+    };
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleMobileNavClick = (elementId: string) => {
-    setIsMobileMenuOpen(false)
+    setIsMobileMenuOpen(false);
     setTimeout(() => {
-      const element = document.getElementById(elementId)
+      const element = document.getElementById(elementId);
       if (element) {
-        const headerOffset = 120 // Account for sticky header height + margin
-        const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-        const offsetPosition = elementPosition - headerOffset
+        const headerOffset = 120; // Account for sticky header height + margin
+        const elementPosition =
+          element.getBoundingClientRect().top + window.pageYOffset;
+        const offsetPosition = elementPosition - headerOffset;
 
         window.scrollTo({
           top: offsetPosition,
           behavior: "smooth",
-        })
+        });
       }
-    }, 100)
-  }
+    }, 100);
+  };
 
   return (
     <div className="min-h-screen w-full relative bg-black">
@@ -49,7 +50,8 @@ export default function Home() {
       <div
         className="absolute inset-0 z-0"
         style={{
-          background: "radial-gradient(ellipse 50% 35% at 50% 0%, rgba(226, 232, 240, 0.12), transparent 60%), #000000",
+          background:
+            "radial-gradient(ellipse 50% 35% at 50% 0%, rgba(226, 232, 240, 0.12), transparent 60%), #000000",
         }}
       />
 
@@ -88,17 +90,18 @@ export default function Home() {
           <a
             className="relative px-4 py-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             onClick={(e) => {
-              e.preventDefault()
-              const element = document.getElementById("features")
+              e.preventDefault();
+              const element = document.getElementById("features");
               if (element) {
-                const headerOffset = 120 // Account for sticky header height + margin
-                const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-                const offsetPosition = elementPosition - headerOffset
+                const headerOffset = 120; // Account for sticky header height + margin
+                const elementPosition =
+                  element.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementPosition - headerOffset;
 
                 window.scrollTo({
                   top: offsetPosition,
                   behavior: "smooth",
-                })
+                });
               }
             }}
           >
@@ -107,17 +110,18 @@ export default function Home() {
           <a
             className="relative px-4 py-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             onClick={(e) => {
-              e.preventDefault()
-              const element = document.getElementById("testimonials")
+              e.preventDefault();
+              const element = document.getElementById("testimonials");
               if (element) {
-                const headerOffset = 120 // Account for sticky header height + margin
-                const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-                const offsetPosition = elementPosition - headerOffset
+                const headerOffset = 120; // Account for sticky header height + margin
+                const elementPosition =
+                  element.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementPosition - headerOffset;
 
                 window.scrollTo({
                   top: offsetPosition,
                   behavior: "smooth",
-                })
+                });
               }
             }}
           >
@@ -126,17 +130,18 @@ export default function Home() {
           <a
             className="relative px-4 py-2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             onClick={(e) => {
-              e.preventDefault()
-              const element = document.getElementById("faq")
+              e.preventDefault();
+              const element = document.getElementById("faq");
               if (element) {
-                const headerOffset = 120 // Account for sticky header height + margin
-                const elementPosition = element.getBoundingClientRect().top + window.pageYOffset
-                const offsetPosition = elementPosition - headerOffset
+                const headerOffset = 120; // Account for sticky header height + margin
+                const elementPosition =
+                  element.getBoundingClientRect().top + window.pageYOffset;
+                const offsetPosition = elementPosition - headerOffset;
 
                 window.scrollTo({
                   top: offsetPosition,
                   behavior: "smooth",
-                })
+                });
               }
             }}
           >
@@ -149,8 +154,8 @@ export default function Home() {
             href="/login"
             className="font-medium transition-colors hover:text-foreground text-muted-foreground text-sm cursor-pointer z-50"
             onClick={(e) => {
-              e.preventDefault()
-              window.location.href = "/login"
+              e.preventDefault();
+              window.location.href = "/login";
             }}
           >
             Log In
@@ -160,8 +165,8 @@ export default function Home() {
             href="/signup"
             className="rounded-md font-bold relative cursor-pointer hover:-translate-y-0.5 transition duration-200 inline-block text-center bg-gradient-to-b from-primary to-primary/80 text-primary-foreground shadow-[0px_2px_0px_0px_rgba(255,255,255,0.3)_inset] px-4 py-2 text-sm z-50"
             onClick={(e) => {
-              e.preventDefault()
-              window.location.href = "/signup"
+              e.preventDefault();
+              window.location.href = "/signup";
             }}
           >
             Sign Up
@@ -177,9 +182,7 @@ export default function Home() {
             alt="Logo"
             className="text-foreground rounded-full size-7 w-7"
           />
-          <span className="text-lg font-bold text-foreground">
-            BlockBayan
-          </span>
+          <span className="text-lg font-bold text-foreground">BlockBayan</span>
         </div>
 
         <button
@@ -189,13 +192,19 @@ export default function Home() {
         >
           <div className="flex flex-col items-center justify-center w-5 h-5 space-y-1">
             <span
-              className={`block w-4 h-0.5 bg-foreground transition-all duration-300 ${isMobileMenuOpen ? "rotate-45 translate-y-1.5" : ""}`}
+              className={`block w-4 h-0.5 bg-foreground transition-all duration-300 ${
+                isMobileMenuOpen ? "rotate-45 translate-y-1.5" : ""
+              }`}
             ></span>
             <span
-              className={`block w-4 h-0.5 bg-foreground transition-all duration-300 ${isMobileMenuOpen ? "opacity-0" : ""}`}
+              className={`block w-4 h-0.5 bg-foreground transition-all duration-300 ${
+                isMobileMenuOpen ? "opacity-0" : ""
+              }`}
             ></span>
             <span
-              className={`block w-4 h-0.5 bg-foreground transition-all duration-300 ${isMobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""}`}
+              className={`block w-4 h-0.5 bg-foreground transition-all duration-300 ${
+                isMobileMenuOpen ? "-rotate-45 -translate-y-1.5" : ""
+              }`}
             ></span>
           </div>
         </button>
@@ -229,8 +238,8 @@ export default function Home() {
                   href="/login"
                   className="px-4 py-3 text-lg font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-background/50 cursor-pointer"
                   onClick={(e) => {
-                    e.preventDefault()
-                    window.location.href = "/login"
+                    e.preventDefault();
+                    window.location.href = "/login";
                   }}
                 >
                   Log In
@@ -239,8 +248,8 @@ export default function Home() {
                   href="/signup"
                   className="px-4 py-3 text-lg font-bold text-center bg-gradient-to-b from-primary to-primary/80 text-primary-foreground rounded-lg shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
                   onClick={(e) => {
-                    e.preventDefault()
-                    window.location.href = "/signup"
+                    e.preventDefault();
+                    window.location.href = "/signup";
                   }}
                 >
                   Sign Up
@@ -272,5 +281,5 @@ export default function Home() {
       {/* Sticky Footer */}
       <StickyFooter />
     </div>
-  )
+  );
 }
