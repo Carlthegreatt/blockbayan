@@ -46,7 +46,7 @@ const mockCampaigns = [
     chain: "Ethereum",
     location: "Mindanao, Philippines",
     image:
-      "https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?w=800&q=80",
+      "https://mindanews.com/wp-content/uploads/2020/07/28haran11.jpg",
   },
   {
     id: "2",
@@ -64,7 +64,7 @@ const mockCampaigns = [
     chain: "Polygon",
     location: "Visayas, Philippines",
     image:
-      "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&q=80",
+      "https://files01.pna.gov.ph/category-list/2024/10/01/batac-flooding.jpg",
   },
   {
     id: "3",
@@ -82,7 +82,7 @@ const mockCampaigns = [
     chain: "Ethereum",
     location: "Luzon, Philippines",
     image:
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&q=80",
+      "https://cdn.prod.website-files.com/6287850a0485ea045a5e0ce2/632899ca01c83a6de49e07b2_WATER%20FOR%20WATERLESS.jpg",
   },
   {
     id: "4",
@@ -100,7 +100,7 @@ const mockCampaigns = [
     chain: "Base",
     location: "Cordillera, Philippines",
     image:
-      "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
+      "https://www.scout.org/sites/default/files/styles/social_media/public/d7/news_pictures/3_344.jpg.webp?itok=qBWXYAuF",
   },
 ];
 

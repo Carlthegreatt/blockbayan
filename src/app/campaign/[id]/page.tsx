@@ -35,26 +35,88 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { generateReceipt, openInExplorer } from "@/lib/receipt-utils";
 
-// Mock campaign data
-const mockCampaignData = {
-  id: "1",
-  title: "Support Local Schools in Mindanao",
-  description:
-    "Help provide educational materials, technology, and infrastructure support for underprivileged schools in the Mindanao region. Your donation will directly fund classroom renovations, computer labs, libraries, and teacher training programs. Every contribution makes a lasting impact on children's futures.",
-  category: "Education",
-  goal: "50 ETH",
-  raised: "32.5 ETH",
-  percentage: 65,
-  donors: 124,
-  verified: true,
-  status: "active",
-  deadline: "2025-11-30",
-  chain: "Ethereum",
-  location: "Mindanao, Philippines",
-  image: "/ethereum.png",
-  contractAddress: "0x742d35Cc6634C0532925a3b844Bc9e7595C2f4",
-  creator: "0x8e3b...A1d9",
-  createdAt: "2025-09-15",
+// Mock campaigns database
+const mockCampaignsData: { [key: string]: any } = {
+  "1": {
+    id: "1",
+    title: "Support Local Schools in Mindanao",
+    description:
+      "Help provide educational materials, technology, and infrastructure support for underprivileged schools in the Mindanao region. Your donation will directly fund classroom renovations, computer labs, libraries, and teacher training programs. Every contribution makes a lasting impact on children's futures.",
+    category: "Education",
+    goal: "50 ETH",
+    raised: "32.5 ETH",
+    percentage: 65,
+    donors: 124,
+    verified: true,
+    status: "active",
+    deadline: "2025-11-30",
+    chain: "Ethereum",
+    location: "Mindanao, Philippines",
+    image: "https://mindanews.com/wp-content/uploads/2020/07/28haran11.jpg",
+    contractAddress: "0x742d35Cc6634C0532925a3b844Bc9e7595C2f4",
+    creator: "0x8e3b...A1d9",
+    createdAt: "2025-09-15",
+  },
+  "2": {
+    id: "2",
+    title: "Medical Aid for Typhoon Victims",
+    description:
+      "Emergency medical supplies and healthcare support for communities affected by recent typhoons. This campaign aims to provide critical medical aid, temporary shelters, and essential supplies to families devastated by natural disasters. Your support will help save lives and rebuild communities.",
+    category: "Healthcare",
+    goal: "100 ETH",
+    raised: "87.2 ETH",
+    percentage: 87,
+    donors: 340,
+    verified: true,
+    status: "active",
+    deadline: "2025-12-15",
+    chain: "Polygon",
+    location: "Visayas, Philippines",
+    image: "https://files01.pna.gov.ph/category-list/2024/10/01/batac-flooding.jpg",
+    contractAddress: "0x9f1a35Dd7845D1643936b4c955Bc8f9a7685B3e7",
+    creator: "0x2c4d...F8a1",
+    createdAt: "2025-08-20",
+  },
+  "3": {
+    id: "3",
+    title: "Community Water Project",
+    description:
+      "Building sustainable water infrastructure for rural communities lacking clean water access. This initiative will construct wells, water filtration systems, and distribution networks to ensure safe drinking water for thousands of families. Clean water is a fundamental right, and your contribution helps make it a reality.",
+    category: "Infrastructure",
+    goal: "75 ETH",
+    raised: "45.8 ETH",
+    percentage: 61,
+    donors: 189,
+    verified: true,
+    status: "active",
+    deadline: "2025-12-30",
+    chain: "Ethereum",
+    location: "Luzon, Philippines",
+    image: "https://cdn.prod.website-files.com/6287850a0485ea045a5e0ce2/632899ca01c83a6de49e07b2_WATER%20FOR%20WATERLESS.jpg",
+    contractAddress: "0x7b4e28Ff9123E5789abcd4f655Cc91a8D3e2C1a8",
+    creator: "0x5a8c...D9f2",
+    createdAt: "2025-09-01",
+  },
+  "4": {
+    id: "4",
+    title: "Indigenous Youth Education Fund",
+    description:
+      "Scholarships and educational programs for indigenous youth to access quality education. This fund supports students from indigenous communities with tuition, school supplies, transportation, and mentorship programs. Education empowers communities and preserves cultural heritage while opening doors to opportunities.",
+    category: "Education",
+    goal: "40 ETH",
+    raised: "28.3 ETH",
+    percentage: 71,
+    donors: 95,
+    verified: false,
+    status: "active",
+    deadline: "2026-01-15",
+    chain: "Base",
+    location: "Cordillera, Philippines",
+    image: "https://www.scout.org/sites/default/files/styles/social_media/public/d7/news_pictures/3_344.jpg.webp?itok=qBWXYAuF",
+    contractAddress: "0x6c8e91Ba2456C7890defg1h234Ee56f7E2d4A8b9",
+    creator: "0x3d2f...A7b9",
+    createdAt: "2025-10-01",
+  },
 };
 
 const mockDonations = [
@@ -94,9 +156,16 @@ export default function CampaignDetailsPage() {
   const [donationTxHash, setDonationTxHash] = useState("");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [walletBalance, setWalletBalance] = useState<string>("0.00");
-  const [campaignData, setCampaignData] = useState(mockCampaignData);
+  const [campaignData, setCampaignData] = useState(
+    mockCampaignsData["1"] || mockCampaignsData["1"]
+  );
 
   useEffect(() => {
+    // Load the correct campaign based on ID
+    if (params.id && mockCampaignsData[params.id as string]) {
+      setCampaignData(mockCampaignsData[params.id as string]);
+    }
+
     // Check if wallet is connected
     const walletData = sessionStorage.getItem("wallet");
     if (walletData) {
@@ -119,7 +188,7 @@ export default function CampaignDetailsPage() {
         if (foundCampaign) {
           // Map the stored campaign to the expected format
           setCampaignData({
-            ...mockCampaignData,
+            ...mockCampaignsData["1"],
             id: foundCampaign.id,
             title: foundCampaign.title,
             description: foundCampaign.description,
@@ -131,11 +200,11 @@ export default function CampaignDetailsPage() {
             deadline: foundCampaign.deadline,
             chain: foundCampaign.chain,
             contractAddress:
-              foundCampaign.contractAddress || mockCampaignData.contractAddress,
+              foundCampaign.contractAddress || mockCampaignsData["1"].contractAddress,
             createdAt: foundCampaign.createdAt || new Date().toISOString(),
             status: foundCampaign.status,
-            image: foundCampaign.image || mockCampaignData.image,
-            donors: foundCampaign.donors || mockCampaignData.donors,
+            image: foundCampaign.image || mockCampaignsData["1"].image,
+            donors: foundCampaign.donors || mockCampaignsData["1"].donors,
             verified: foundCampaign.verified || false,
           });
         }
