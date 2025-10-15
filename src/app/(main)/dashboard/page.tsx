@@ -43,24 +43,8 @@ import {
   initializeDefaultCampaigns,
 } from "@/store/walletStore";
 import { WALLET_OPTIONS } from "@/config/wallets";
+import { generateCreatorReputation } from "@/lib/reputation";
 import { Input } from "@/components/ui/input";
-
-// Generate random reputation for campaign creators
-const generateCreatorReputation = (seed: string) => {
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = (hash << 5) - hash + seed.charCodeAt(i);
-    hash = hash & hash;
-  }
-  const random = Math.abs(hash) / 2147483647;
-  
-  return {
-    rating: (3.5 + random * 1.5).toFixed(1),
-    totalReviews: Math.floor(random * 150) + 10,
-    campaignsCreated: Math.floor(random * 20) + 1,
-    totalRaised: (random * 500 + 50).toFixed(1),
-  };
-};
 
 // User profiles database for search
 const userProfiles = [
@@ -461,12 +445,14 @@ export default function DashboardPage() {
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
             <div className="flex-1">
-              <h1 className="text-4xl font-bold text-foreground mb-2">Dashboard</h1>
+              <h1 className="text-4xl font-bold text-foreground mb-2">
+                Dashboard
+              </h1>
               <p className="text-muted-foreground">
                 Welcome back! Here's your blockchain giving overview.
               </p>
             </div>
-            
+
             {/* User Search */}
             <div className="relative w-full md:w-96">
               <div className="relative">
@@ -492,7 +478,9 @@ export default function DashboardPage() {
                     {searchResults.length > 0 ? (
                       <div className="p-2">
                         {searchResults.map((user) => {
-                          const reputation = generateCreatorReputation(user.address);
+                          const reputation = generateCreatorReputation(
+                            user.address
+                          );
                           return (
                             <button
                               key={user.id}
@@ -506,7 +494,9 @@ export default function DashboardPage() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <p className="font-semibold truncate">{user.name}</p>
+                                  <p className="font-semibold truncate">
+                                    {user.name}
+                                  </p>
                                   <div className="flex items-center gap-1">
                                     <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                                     <span className="text-xs text-muted-foreground">
@@ -685,73 +675,108 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-              {userCampaigns.map((campaign) => (
-                <Card key={campaign.id}>
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1">
-                        <CardTitle className="text-lg">
-                          {campaign.title}
-                        </CardTitle>
-                        <CardDescription>{campaign.chain}</CardDescription>
-                      </div>
-                      <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-500/10 text-green-500">
-                        {campaign.status}
-                      </span>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <div className="flex items-center justify-between text-sm mb-2">
-                        <span className="text-muted-foreground">Progress</span>
-                        <span className="font-semibold">
-                          {campaign.percentage}%
+              {userCampaigns.map((campaign) => {
+                const campaignWithCreator = campaign as any;
+                const creatorRep = campaignWithCreator.creator
+                  ? generateCreatorReputation(
+                      campaignWithCreator.creator.address
+                    )
+                  : null;
+
+                return (
+                  <Card key={campaign.id}>
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1">
+                          <CardTitle className="text-lg">
+                            {campaign.title}
+                          </CardTitle>
+                          <CardDescription>{campaign.chain}</CardDescription>
+                        </div>
+                        <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-green-500/10 text-green-500">
+                          {campaign.status}
                         </span>
                       </div>
-                      <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
-                        <div
-                          className="bg-primary h-full transition-all duration-300"
-                          style={{ width: `${campaign.percentage}%` }}
-                        />
-                      </div>
-                    </div>
 
-                    <div className="flex items-center justify-between text-sm">
+                      {/* Creator Info with Rating */}
+                      {campaignWithCreator.creator && creatorRep && (
+                        <div className="flex items-center gap-2 mt-3 p-2 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                            <span className="text-xs font-semibold text-primary">
+                              {campaignWithCreator.creator.avatar}
+                            </span>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {campaignWithCreator.creator.name}
+                            </p>
+                            <div className="flex items-center gap-1">
+                              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                              <span className="text-xs text-muted-foreground">
+                                {creatorRep.rating} ({creatorRep.totalReviews})
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </CardHeader>
+                    <CardContent className="space-y-4">
                       <div>
-                        <p className="text-muted-foreground">Raised</p>
-                        <p className="font-bold text-lg">{campaign.raised}</p>
+                        <div className="flex items-center justify-between text-sm mb-2">
+                          <span className="text-muted-foreground">
+                            Progress
+                          </span>
+                          <span className="font-semibold">
+                            {campaign.percentage}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
+                          <div
+                            className="bg-primary h-full transition-all duration-300"
+                            style={{ width: `${campaign.percentage}%` }}
+                          />
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <p className="text-muted-foreground">Goal</p>
-                        <p className="font-bold text-lg">{campaign.goal}</p>
+
+                      <div className="flex items-center justify-between text-sm">
+                        <div>
+                          <p className="text-muted-foreground">Raised</p>
+                          <p className="font-bold text-lg">{campaign.raised}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-muted-foreground">Goal</p>
+                          <p className="font-bold text-lg">{campaign.goal}</p>
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="flex items-center text-sm text-muted-foreground">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      Ends: {new Date(campaign.deadline).toLocaleDateString()}
-                    </div>
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Ends: {new Date(campaign.deadline).toLocaleDateString()}
+                      </div>
 
-                    <div className="flex space-x-2 pt-2">
-                      <Link
-                        href={`/campaign/${campaign.id}`}
-                        className="flex-1"
-                      >
-                        <Button variant="outline" className="w-full">
-                          View Details
+                      <div className="flex space-x-2 pt-2">
+                        <Link
+                          href={`/campaign/${campaign.id}`}
+                          className="flex-1"
+                        >
+                          <Button variant="outline" className="w-full">
+                            View Details
+                          </Button>
+                        </Link>
+                        <Button
+                          variant="default"
+                          className="flex-1"
+                          onClick={() =>
+                            setSelectedCampaignForWithdraw(campaign)
+                          }
+                        >
+                          Withdraw Funds
                         </Button>
-                      </Link>
-                      <Button
-                        variant="default"
-                        className="flex-1"
-                        onClick={() => setSelectedCampaignForWithdraw(campaign)}
-                      >
-                        Withdraw Funds
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
 
             {userCampaigns.length === 0 && (

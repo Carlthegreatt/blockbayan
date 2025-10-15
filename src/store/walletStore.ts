@@ -415,55 +415,100 @@ export function initializeDefaultCampaigns(): void {
   const existing = sessionStorage.getItem("userCampaigns");
   if (existing) return;
 
+  // Get logged-in user info
+  const userDataStr = sessionStorage.getItem("user");
+  let userName = "Demo User";
+  let userInitials = "DU";
+
+  if (userDataStr) {
+    try {
+      const userData = JSON.parse(userDataStr);
+      userName = userData.name || "Demo User";
+      const nameParts = userName.split(" ");
+      userInitials =
+        nameParts.length >= 2
+          ? `${nameParts[0][0]}${nameParts[1][0]}`.toUpperCase()
+          : userName.substring(0, 2).toUpperCase();
+    } catch (error) {
+      console.error("Error parsing user data:", error);
+    }
+  }
+
   const defaultCampaigns = [
     {
       id: "user-campaign-1",
       title: "Community Food Bank Drive",
+      description:
+        "Help us provide nutritious meals and food packages to families in need across Metro Manila. Every contribution goes directly to feeding programs.",
+      category: "Community",
       goal: "50 ETH",
       raised: "32.5 ETH",
       percentage: 65,
-      status: "active",
-      chain: "Ethereum",
-      category: "Community",
-      deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
       donors: 47,
-      description: "Help us provide meals to families in need",
       verified: true,
+      status: "active",
+      deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0], // Format as YYYY-MM-DD
+      chain: "Ethereum",
       location: "Manila, Philippines",
-      image: "https://foodbank.org.ph/wp-content/uploads/2024/01/bulusan-21.png",
+      image:
+        "https://foodbank.org.ph/wp-content/uploads/2024/01/bulusan-21.png",
+      creator: {
+        name: userName,
+        address: "0x742d...C2f4",
+        avatar: userInitials,
+      },
     },
     {
       id: "user-campaign-2",
       title: "Medical Equipment for Rural Clinics",
+      description:
+        "Fund essential medical equipment and supplies for underserved rural clinics. Your donation helps save lives in remote communities.",
+      category: "Healthcare",
       goal: "75 ETH",
       raised: "58.8 ETH",
       percentage: 78,
-      status: "active",
-      chain: "Ethereum",
-      category: "Healthcare",
-      deadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString(), // 45 days from now
       donors: 112,
-      description:
-        "Fund essential medical equipment for underserved communities",
       verified: true,
+      status: "active",
+      deadline: new Date(Date.now() + 45 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0],
+      chain: "Ethereum",
       location: "Cebu, Philippines",
-      image: "https://images.unsplash.com/photo-1516841273335-e39b37888115?w=800&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1516841273335-e39b37888115?w=800&auto=format&fit=crop",
+      creator: {
+        name: userName,
+        address: "0x742d...C2f4",
+        avatar: userInitials,
+      },
     },
     {
       id: "user-campaign-3",
       title: "School Supplies for 500 Students",
+      description:
+        "Provide essential school supplies including books, notebooks, and learning materials for 500 students in remote areas.",
+      category: "Education",
       goal: "25 ETH",
       raised: "25 ETH",
       percentage: 100,
-      status: "completed",
-      chain: "Ethereum",
-      category: "Education",
-      deadline: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
       donors: 89,
-      description: "Provide school supplies for students in remote areas",
       verified: true,
+      status: "completed",
+      deadline: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0],
+      chain: "Ethereum",
       location: "Davao, Philippines",
-      image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=800&auto=format&fit=crop",
+      creator: {
+        name: userName,
+        address: "0x742d...C2f4",
+        avatar: userInitials,
+      },
     },
   ];
 
